@@ -335,17 +335,16 @@ document.getElementById('fresh-table').innerHTML = countryOrder.map(c => {
   </tr>`;
 }).join('');
 
-const allStats = computeStats('all');
+const allStats = computeStats('d7');
 function pct(country, key) {
   const s = allStats[country];
   return s.total ? Math.round(100*s.counts[key]/s.total) : 0;
 }
 document.getElementById('headline-callout').innerHTML =
-  `<b>Kľúčové zistenie:</b> nejde len o dva tábory. SK je najviac <b>SF7/CR5</b> (${pct('SK','sf7cr5')}%), ` +
+  `<b>Kľúčové zistenie</b> (počítané len z repeaterov s advertom za posledných ≤7&nbsp;dní — aktuálne živá sieť, nie historický súhrn): nejde len o dva tábory. SK je najviac <b>SF7/CR5</b> (${pct('SK','sf7cr5')}%), ` +
   `AT/DE/SI sú najviac <b>SF8/CR8</b> (${pct('AT','sf8cr8')}% / ${pct('DE','sf8cr8')}% / ${pct('SI','sf8cr8')}%), ` +
   `<b>CZ má takmer výhradne svoj vlastný preset</b> na inej frekvencii (869.432MHz, ${pct('CZ','cz_narrow')}%) a ` +
-  `<b>PL</b> je väčšinovo SF8/CR8 (${pct('PL','sf8cr8')}%) s výrazným vedľajším zhlukom SF6/CR8 (${pct('PL','pl_sf6cr8')}%), ktorý nemá oficiálny preset. ` +
-  `Filter čerstvosti nižšie (default ≤7&nbsp;dní) ukazuje, že tento obraz platí aj pri aktuálne živej sieti, nielen historicky.`;
+  `<b>PL</b> je väčšinovo SF8/CR8 (${pct('PL','sf8cr8')}%) s výrazným vedľajším zhlukom SF6/CR8 (${pct('PL','pl_sf6cr8')}%), ktorý nemá oficiálny preset.`;
 
 document.getElementById('findings').innerHTML = `
   <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;padding-left:20px">
@@ -367,7 +366,7 @@ document.getElementById('findings').innerHTML = `
     <li><b>GR (${allStats.GR.total} repeaterov):</b> malá vzorka, ${pct('GR','sf8cr8')}% SF8/CR8.</li>
     <li><b>HR (${allStats.HR.total} repeaterov):</b> najmenšia vzorka spomedzi všetkých 17 krajín, zatiaľ takmer celá SF8/CR8.</li>
     <li><b>Cross-border dôsledok:</b> na spoločných hraniciach sa stretávajú minimálne tri nekompatibilné rádio-svety — SF7/CR5 (SK), SF8/CR8 (AT/DE/SI/väčšina PL) a Českom izolovaný 869.432MHz preset — bez ručnej zhody nastavení sa uzly medzi nimi nespoja, bez ohľadu na signál/dosah.</li>
-    <li><b>Čerstvosť:</b> porovnaj chip „Všetky&rdquo; a „≤3 dni&rdquo; — rozdelenie presetov sa mení len minimálne, mismatch teda nie je artefakt starých/opustených uzlov.</li>
+    <li><b>Čerstvosť:</b> všetky čísla vyššie sú počítané len z repeaterov s advertom za posledných ≤7&nbsp;dní. Chipy vyššie umožňujú prepnúť na iné okno (napr. „Všetky&rdquo; alebo „&gt;30&nbsp;dní&rdquo;) a porovnať, či sa obraz mení pri zahrnutí starších/opustených uzlov.</li>
   </ul>
 `;
 
