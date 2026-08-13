@@ -82,6 +82,8 @@
   .stat-tile .count { font-size: 1.7rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 2px 0 6px; }
   .stat-tile .dom { font-size: 0.78rem; color: var(--text-secondary); }
   .stat-tile .dom b { color: var(--text-primary); }
+  .stat-tile .density { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+  .stat-tile .density b { color: var(--text-primary); }
 
   .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 20px; overflow-x: auto; }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px; }
@@ -135,6 +137,7 @@
 
   <h2>Prehľad podľa krajiny</h2>
   <p class="section-note" id="filter-echo"></p>
+  <p class="section-note">Hustota = počet repeaterov na 1000&nbsp;km² rozlohy krajiny. Reaguje na filter čerstvosti vyššie — pri prísnejšom okne (napr. ≤3&nbsp;dni) tak vidno hustotu <i>aktuálne živej</i> siete, nie celej historickej.</p>
   <div class="stat-grid" id="stat-grid"></div>
 
   <h2>Rozdelenie rádiových parametrov</h2>
@@ -233,6 +236,21 @@ function computeStats(filterKey) {
   }
   return stats;
 }
+const COUNTRY_AREA_KM2 = {
+  SK:49035, AT:83879, HU:93030, CZ:78871, DE:357022, SI:20273, PL:312696, IT:301340,
+  CH:41285, BE:30528, NL:41850, LU:2586, UA:603628, DK:42933, HR:56594, RO:238397, GR:131957,
+};
+// Density reacts to the freshness-chip selection, same as the count above it.
+let densityByCountry = {};
+function computeDensity(filterKey) {
+  const filtStats = computeStats(filterKey);
+  for (const c of countryOrder) {
+    const area = COUNTRY_AREA_KM2[c];
+    const total = filtStats[c].total;
+    densityByCountry[c] = (area && total) ? total / area * 1000 : 0; // repeaters per 1,000 km²
+  }
+}
+
 function dominant(s) {
   if (s.total === 0) return { name: '—', pct: 0 };
   const entries = BUCKETS.map(b => [b.label, s.counts[b.key]]);
@@ -284,6 +302,7 @@ function renderMarkers(filterKey) {
 function render() {
   const stats = computeStats(activeFilter);
   const filt = FILTERS.find(f => f.key === activeFilter);
+  computeDensity(activeFilter);
 
   document.getElementById('filter-echo').textContent = activeFilter === 'all'
     ? 'Zobrazené: všetky repeatery, bez ohľadu na čerstvosť advertu.'
@@ -296,6 +315,7 @@ function render() {
       <div class="country">${countryLabel[c]} (${c})</div>
       <div class="count">${s.total}</div>
       <div class="dom">dominantný preset: <b>${d.name}</b> ${s.total ? `(${d.pct}%)` : ''}</div>
+      <div class="density">hustota: <b>${densityByCountry[c].toFixed(2)}</b> rpt / 1000&nbsp;km²</div>
     </div>`;
   }).join('');
 
