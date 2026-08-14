@@ -23,7 +23,9 @@ Live stránka: https://zazrivec.github.io/meshcore-empire-coverage/
      bodov) do `data/YYYY-MM-DD.json`,
   7. prečíta celú históriu `data/*.json` a dopočíta trendové časové rady
      (repeaterov v čase, celkovo aj per krajina), ktoré sa tiež vložia do
-     reportu (sekcia "Trendy", sparklines v dlaždiciach krajín).
+     reportu (sekcia "Trendy" — celkovo aj per krajina — a "Trendy podľa
+     presetu", ktorá ukazuje, ktoré rádio presety v sieti rastú a ktoré
+     ubúdajú; plus sparklines v dlaždiciach krajín).
 - `scripts/borders.json` — zjednodušené hranice krajín (z geoBoundaries.org,
   Douglas-Peucker zjednodušenie). Tieto sa nemenia denne, preto sú uložené
   staticky a build ich len číta — nefetchujú sa nanovo pri každom behu.

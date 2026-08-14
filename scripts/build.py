@@ -221,15 +221,34 @@ def load_history():
 
 def build_trends(history):
     """Turn the accumulated daily snapshots into compact time series for the
-    report: total repeaters per day (overall + per country)."""
+    report: total repeaters per day (overall + per country + per radio-preset
+    bucket, summed across all countries) — this is what shows what's growing
+    vs. shrinking preset-wise."""
     dates = [h["date"] for h in history]
     grand_total = [h["total_repeaters"] for h in history]
+
     country_totals = {c: [] for c in COUNTRIES}
+    bucket_totals = {k: [] for k in BUCKET_KEYS}
+
     for h in history:
+        by_country = h.get("by_country", {})
         for c in COUNTRIES:
-            row = h.get("by_country", {}).get(c)
+            row = by_country.get(c)
             country_totals[c].append(row["total"] if row else 0)
-    return {"dates": dates, "grandTotal": grand_total, "countryTotals": country_totals}
+        day_bucket_sums = {k: 0 for k in BUCKET_KEYS}
+        for row in by_country.values():
+            for k, v in row.get("buckets", {}).items():
+                if k in day_bucket_sums:
+                    day_bucket_sums[k] += v
+        for k in BUCKET_KEYS:
+            bucket_totals[k].append(day_bucket_sums[k])
+
+    return {
+        "dates": dates,
+        "grandTotal": grand_total,
+        "countryTotals": country_totals,
+        "bucketTotals": bucket_totals,
+    }
 
 
 def render(points, borders, trends):

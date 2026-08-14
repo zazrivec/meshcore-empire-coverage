@@ -189,6 +189,19 @@
   </div>
   <p class="section-note" id="trends-empty" style="display:none">Zatiaľ je k dispozícii len jeden denný snapshot — história sa buduje s každým ďalším behom buildu (denne cez GitHub Action, alebo ručne). Vráť sa o pár dní.</p>
 
+  <h3 id="preset-trends-heading" style="font-size:1rem;font-weight:700;margin:28px 0 4px;display:none">Trendy podľa presetu</h3>
+  <p class="section-note" id="preset-trends-note" style="display:none">Súčet naprieč všetkými 17 krajinami, per preset, v čase — ukazuje čo v sieti reálne pribúda a čo uberá (napr. či prechod na nový preset naozaj prebieha, alebo je to len šum jednotlivých dní).</p>
+  <div class="chart-wrap" id="preset-trends-chart-wrap" style="display:none">
+    <div class="legend" id="preset-trends-legend"></div>
+    <svg class="mapsvg" id="presettrendsvg" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="chart-wrap" id="preset-trends-table-wrap" style="display:none">
+    <table>
+      <thead><tr><th>Preset</th><th class="num">Najstarší záznam</th><th class="num">Najnovší záznam</th><th class="num">Δ</th><th class="num">Δ%</th></tr></thead>
+      <tbody id="preset-trends-table"></tbody>
+    </table>
+  </div>
+
   <h2>Zistenia</h2>
   <div id="findings"></div>
 
@@ -518,7 +531,96 @@ function renderTrends() {
   }).join('');
 }
 
+function renderPresetTrends() {
+  const n = trends.dates.length;
+  if (n < 2 || !trends.bucketTotals) return;
+
+  document.getElementById('preset-trends-heading').style.display = '';
+  document.getElementById('preset-trends-note').style.display = '';
+  document.getElementById('preset-trends-chart-wrap').style.display = '';
+  document.getElementById('preset-trends-table-wrap').style.display = '';
+
+  const W = 900, H = 260, PAD = 30;
+  const allValues = BUCKETS.flatMap(b => trends.bucketTotals[b.key] || []);
+  const max = Math.max(...allValues, 1);
+  const min = 0;
+  const range = (max - min) || 1;
+  const stepX = (W - 2 * PAD) / (n - 1);
+  const xy = (i, v) => [PAD + i * stepX, H - PAD - (v - min) / range * (H - 2 * PAD)];
+
+  const svg = document.getElementById('presettrendsvg');
+  const svgns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+
+  const axis = document.createElementNS(svgns, 'line');
+  axis.setAttribute('x1', PAD); axis.setAttribute('y1', H - PAD);
+  axis.setAttribute('x2', W - PAD); axis.setAttribute('y2', H - PAD);
+  axis.setAttribute('stroke', 'var(--border)');
+  svg.appendChild(axis);
+
+  for (const b of BUCKETS) {
+    const series = trends.bucketTotals[b.key] || [];
+    if (!series.length || series.every(v => v === 0)) continue;
+    const pts = series.map((v, i) => xy(i, v).map(x => x.toFixed(1)).join(',')).join(' ');
+    const poly = document.createElementNS(svgns, 'polyline');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('fill', 'none');
+    poly.setAttribute('stroke', b.color);
+    poly.setAttribute('stroke-width', '2');
+    svg.appendChild(poly);
+
+    series.forEach((v, i) => {
+      const [x, y] = xy(i, v);
+      const c = document.createElementNS(svgns, 'circle');
+      c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1)); c.setAttribute('r', '2.5');
+      c.setAttribute('fill', b.color);
+      const t = document.createElementNS(svgns, 'title');
+      t.textContent = `${b.label} · ${trends.dates[i]}: ${v}`;
+      c.appendChild(t);
+      svg.appendChild(c);
+    });
+  }
+
+  const firstLabel = document.createElementNS(svgns, 'text');
+  firstLabel.setAttribute('x', PAD); firstLabel.setAttribute('y', H - 8);
+  firstLabel.setAttribute('fill', 'var(--text-muted)'); firstLabel.setAttribute('font-size', '11');
+  firstLabel.textContent = trends.dates[0];
+  svg.appendChild(firstLabel);
+
+  const lastLabel = document.createElementNS(svgns, 'text');
+  lastLabel.setAttribute('x', W - PAD); lastLabel.setAttribute('y', H - 8);
+  lastLabel.setAttribute('fill', 'var(--text-muted)'); lastLabel.setAttribute('font-size', '11');
+  lastLabel.setAttribute('text-anchor', 'end');
+  lastLabel.textContent = trends.dates[trends.dates.length - 1];
+  svg.appendChild(lastLabel);
+
+  document.getElementById('preset-trends-legend').innerHTML = BUCKETS.map(b =>
+    `<span title="${b.desc}"><i style="background:${b.color}"></i>${b.label}</span>`
+  ).join('');
+
+  const rows = BUCKETS.map(b => {
+    const s = trends.bucketTotals[b.key] || [];
+    const first = s[0] ?? 0, last = s[s.length - 1] ?? 0;
+    const delta = last - first;
+    const deltaPct = first ? Math.round(delta / first * 1000) / 10 : (last ? Infinity : 0);
+    return { b, first, last, delta, deltaPct };
+  }).sort((a, b) => b.delta - a.delta);
+
+  document.getElementById('preset-trends-table').innerHTML = rows.map(({ b, first, last, delta, deltaPct }) => {
+    const color = delta > 0 ? 'var(--series-sf8)' : (delta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
+    const pctLabel = deltaPct === Infinity ? 'nové' : `${deltaPct > 0 ? '+' : ''}${deltaPct}%`;
+    return `<tr>
+      <td><i style="background:${b.color};width:10px;height:10px;border-radius:2px;display:inline-block;margin-right:6px;vertical-align:middle"></i>${b.label}</td>
+      <td class="num">${first}</td>
+      <td class="num">${last}</td>
+      <td class="num" style="color:${color}">${delta > 0 ? '+' : ''}${delta}</td>
+      <td class="num" style="color:${color}">${pctLabel}</td>
+    </tr>`;
+  }).join('');
+}
+
 renderTrends();
+renderPresetTrends();
 render();
 </script>
 </body>
