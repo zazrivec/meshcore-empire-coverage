@@ -9,8 +9,20 @@ bucketing, and renders the static index.html served by GitHub Pages.
 Usage:
     python3 scripts/build.py
 
+Also writes a small daily snapshot summary to data/YYYY-MM-DD.json (per-country
+totals + preset-bucket breakdown, NOT the full point list — kept tiny on
+purpose so the history accumulates cheaply in git). On every run it re-reads
+the full data/ history and computes trend series (total repeaters per country
+per day) that get embedded into the report alongside the current snapshot.
+
+map.meshcore.io itself has no event/history API (verified: /api/v1/nodes is a
+full-table dump with no working pagination/since filters, and there is no
+per-node advert log) — this daily snapshot is how this project builds its own
+trend history over time.
+
 Output:
-    index.html   (repo root — this is what GitHub Pages serves)
+    index.html        (repo root — this is what GitHub Pages serves)
+    data/YYYY-MM-DD.json   (daily summary snapshot, accumulated over time)
 
 No third-party dependencies — stdlib only, so it runs unmodified in CI.
 """
@@ -22,6 +34,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 SCRIPTS_DIR = Path(__file__).resolve().parent
+DATA_DIR = REPO_ROOT / "data"
 
 NODES_API_URL = "https://map.meshcore.io/api/v1/nodes?short=1"
 TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
@@ -30,6 +43,9 @@ OUTPUT_PATH = REPO_ROOT / "index.html"
 
 COUNTRIES = ["SK", "AT", "HU", "CZ", "DE", "SI", "PL", "IT",
              "CH", "BE", "NL", "LU", "UA", "DK", "HR", "RO", "GR"]
+
+BUCKET_KEYS = ["sf8cr8", "sf7cr5", "cz_narrow", "sf8cr5", "pl_sf6cr8",
+               "eu433", "sf7cr8", "eu_dep", "other"]
 
 REPEATER_TYPE = 2
 
@@ -163,8 +179,61 @@ def build_points(nodes, borders, bbox):
     return points
 
 
-def render(points, borders):
-    data = {"points": points, "borders": borders}
+def summarize(points):
+    """Tiny per-country / per-bucket count summary — this is what gets
+    persisted to data/YYYY-MM-DD.json, not the full point list."""
+    by_country = {}
+    for c in COUNTRIES:
+        by_country[c] = {"total": 0, "buckets": {k: 0 for k in BUCKET_KEYS}}
+    for p in points:
+        row = by_country.setdefault(p["c"], {"total": 0, "buckets": {k: 0 for k in BUCKET_KEYS}})
+        row["total"] += 1
+        row["buckets"][p["b"]] = row["buckets"].get(p["b"], 0) + 1
+    return {
+        "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),
+        "generated_at": datetime.now(timezone.utc).isoformat(),
+        "total_repeaters": len(points),
+        "by_country": by_country,
+    }
+
+
+def write_daily_snapshot(summary):
+    DATA_DIR.mkdir(exist_ok=True)
+    path = DATA_DIR / f"{summary['date']}.json"
+    path.write_text(json.dumps(summary, indent=2, sort_keys=True), encoding="utf-8")
+    log(f"wrote snapshot {path}")
+    return path
+
+
+def load_history():
+    """Read every data/YYYY-MM-DD.json, sorted oldest to newest."""
+    if not DATA_DIR.exists():
+        return []
+    history = []
+    for f in sorted(DATA_DIR.glob("*.json")):
+        try:
+            history.append(json.loads(f.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError) as e:
+            log(f"skipping unreadable snapshot {f}: {e}")
+    history.sort(key=lambda s: s["date"])
+    return history
+
+
+def build_trends(history):
+    """Turn the accumulated daily snapshots into compact time series for the
+    report: total repeaters per day (overall + per country)."""
+    dates = [h["date"] for h in history]
+    grand_total = [h["total_repeaters"] for h in history]
+    country_totals = {c: [] for c in COUNTRIES}
+    for h in history:
+        for c in COUNTRIES:
+            row = h.get("by_country", {}).get(c)
+            country_totals[c].append(row["total"] if row else 0)
+    return {"dates": dates, "grandTotal": grand_total, "countryTotals": country_totals}
+
+
+def render(points, borders, trends):
+    data = {"points": points, "borders": borders, "trends": trends}
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     build_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     html = template.replace("__DATA__", json.dumps(data)).replace("__BUILD_DATE__", build_date)
@@ -182,7 +251,14 @@ def main():
     points = build_points(nodes, borders, bbox)
     log(f"assigned {len(points)} repeaters across {len(COUNTRIES)} countries")
 
-    html = render(points, borders)
+    summary = summarize(points)
+    write_daily_snapshot(summary)
+
+    history = load_history()
+    trends = build_trends(history)
+    log(f"trend history spans {len(history)} day(s): {trends['dates'][:1]}..{trends['dates'][-1:]}")
+
+    html = render(points, borders, trends)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     log(f"wrote {OUTPUT_PATH} ({len(html):,} bytes)")
 

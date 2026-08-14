@@ -92,6 +92,9 @@
   .stat-tile .dom b { color: var(--text-primary); }
   .stat-tile .density { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
   .stat-tile .density b { color: var(--text-primary); }
+  .spark-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+  .spark { width: 70px; height: 20px; flex-shrink: 0; }
+  .spark-delta { font-size: 0.72rem; font-variant-numeric: tabular-nums; }
 
   .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 20px; overflow-x: auto; }
   .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px; }
@@ -119,6 +122,7 @@
 
   .map-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
   #map { width: 100%; height: 640px; border-radius: 6px; }
+  svg.mapsvg { width: 100%; height: auto; display: block; }
   .leaflet-container { background: #dfe6e0; font-family: inherit; }
 
   footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); }
@@ -171,10 +175,24 @@
     </table>
   </div>
 
+  <h2>Trendy</h2>
+  <p class="section-note" id="trends-note">Počet repeaterov v čase, počítaný z vlastných denných snapshotov tohto buildu (map.meshcore.io samo o sebe históriu adverts neposkytuje — pozri poznámku nižšie).</p>
+  <div class="chart-wrap" id="trends-chart-wrap" style="display:none">
+    <div class="legend" id="trends-legend"></div>
+    <svg class="mapsvg" id="trendsvg" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <div class="chart-wrap" id="trends-table-wrap" style="display:none">
+    <table>
+      <thead><tr><th>Krajina</th><th class="num">Najstarší záznam</th><th class="num">Najnovší záznam</th><th class="num">Δ</th><th class="num">Δ%</th></tr></thead>
+      <tbody id="trends-table"></tbody>
+    </table>
+  </div>
+  <p class="section-note" id="trends-empty" style="display:none">Zatiaľ je k dispozícii len jeden denný snapshot — história sa buduje s každým ďalším behom buildu (denne cez GitHub Action, alebo ručne). Vráť sa o pár dní.</p>
+
   <h2>Zistenia</h2>
   <div id="findings"></div>
 
-  <footer>Dáta z verejného API map.meshcore.io, api.meshcore.nz, OpenStreetMap a geoBoundaries.org — jednorazový lokálny snapshot, čísla sa menia s rastom siete.</footer>
+  <footer>Dáta z verejného API map.meshcore.io, api.meshcore.nz, OpenStreetMap a geoBoundaries.org — jednorazový lokálny snapshot, čísla sa menia s rastom siete. Historické trendy sú vlastná dátová sada tohto projektu (denné snapshoty v <code>data/</code>), nie z API map.meshcore.io — to samo históriu neposkytuje (žiadny per-advert event log, len aktuálny stav uzla).</footer>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
@@ -319,11 +337,13 @@ function render() {
   document.getElementById('stat-grid').innerHTML = countryOrder.map(c => {
     const s = stats[c];
     const d = dominant(s);
+    const spark = sparklineFor(c);
     return `<div class="stat-tile">
       <div class="country">${countryLabel[c]} (${c})</div>
       <div class="count">${s.total}</div>
       <div class="dom">dominantný preset: <b>${d.name}</b> ${s.total ? `(${d.pct}%)` : ''}</div>
       <div class="density">hustota: <b>${densityByCountry[c].toFixed(2)}</b> rpt / 1000&nbsp;km²</div>
+      ${spark}
     </div>`;
   }).join('');
 
@@ -398,6 +418,107 @@ document.getElementById('findings').innerHTML = `
   </ul>
 `;
 
+// ---- Trends (built from accumulated daily snapshots in data/) ----
+const trends = DATA.trends || { dates: [], grandTotal: [], countryTotals: {} };
+
+function sparklineFor(country) {
+  const series = trends.countryTotals[country] || [];
+  if (series.length < 2) return '';
+  const w = 100, h = 24;
+  const max = Math.max(...series, 1);
+  const min = Math.min(...series, 0);
+  const range = (max - min) || 1;
+  const step = w / (series.length - 1);
+  const pts = series.map((v, i) => `${(i * step).toFixed(1)},${(h - (v - min) / range * h).toFixed(1)}`).join(' ');
+  const first = series[0], last = series[series.length - 1];
+  const delta = last - first;
+  const deltaColor = delta > 0 ? 'var(--series-sf8)' : (delta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
+  const deltaSign = delta > 0 ? '+' : '';
+  return `<div class="spark-row">
+    <svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>
+    <span class="spark-delta" style="color:${deltaColor}">${deltaSign}${delta} (${trends.dates.length}d)</span>
+  </div>`;
+}
+
+function renderTrends() {
+  const n = trends.dates.length;
+  if (n < 2) {
+    document.getElementById('trends-empty').style.display = '';
+    return;
+  }
+  document.getElementById('trends-chart-wrap').style.display = '';
+  document.getElementById('trends-table-wrap').style.display = '';
+
+  const W = 900, H = 260, PAD = 30;
+  const series = trends.grandTotal;
+  const max = Math.max(...series, 1);
+  const min = Math.min(...series, 0);
+  const range = (max - min) || 1;
+  const stepX = (W - 2 * PAD) / (n - 1);
+  const xy = (i, v) => [PAD + i * stepX, H - PAD - (v - min) / range * (H - 2 * PAD)];
+  const pathPts = series.map((v, i) => xy(i, v).map(x => x.toFixed(1)).join(',')).join(' ');
+
+  const svg = document.getElementById('trendsvg');
+  const svgns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+
+  const axis = document.createElementNS(svgns, 'line');
+  axis.setAttribute('x1', PAD); axis.setAttribute('y1', H - PAD);
+  axis.setAttribute('x2', W - PAD); axis.setAttribute('y2', H - PAD);
+  axis.setAttribute('stroke', 'var(--border)');
+  svg.appendChild(axis);
+
+  const poly = document.createElementNS(svgns, 'polyline');
+  poly.setAttribute('points', pathPts);
+  poly.setAttribute('fill', 'none');
+  poly.setAttribute('stroke', 'var(--accent)');
+  poly.setAttribute('stroke-width', '2.5');
+  svg.appendChild(poly);
+
+  series.forEach((v, i) => {
+    const [x, y] = xy(i, v);
+    const c = document.createElementNS(svgns, 'circle');
+    c.setAttribute('cx', x.toFixed(1)); c.setAttribute('cy', y.toFixed(1)); c.setAttribute('r', '3');
+    c.setAttribute('fill', 'var(--accent)');
+    const t = document.createElementNS(svgns, 'title');
+    t.textContent = `${trends.dates[i]}: ${v} repeaterov`;
+    c.appendChild(t);
+    svg.appendChild(c);
+  });
+
+  const firstLabel = document.createElementNS(svgns, 'text');
+  firstLabel.setAttribute('x', PAD); firstLabel.setAttribute('y', H - 8);
+  firstLabel.setAttribute('fill', 'var(--text-muted)'); firstLabel.setAttribute('font-size', '11');
+  firstLabel.textContent = trends.dates[0];
+  svg.appendChild(firstLabel);
+
+  const lastLabel = document.createElementNS(svgns, 'text');
+  lastLabel.setAttribute('x', W - PAD); lastLabel.setAttribute('y', H - 8);
+  lastLabel.setAttribute('fill', 'var(--text-muted)'); lastLabel.setAttribute('font-size', '11');
+  lastLabel.setAttribute('text-anchor', 'end');
+  lastLabel.textContent = trends.dates[trends.dates.length - 1];
+  svg.appendChild(lastLabel);
+
+  document.getElementById('trends-legend').innerHTML =
+    `<span><i style="background:var(--accent)"></i>Repeaterov celkovo (17 krajín) — ${trends.dates[0]} → ${trends.dates[n - 1]}</span>`;
+
+  document.getElementById('trends-table').innerHTML = countryOrder.map(c => {
+    const s = trends.countryTotals[c] || [];
+    const first = s[0] ?? 0, last = s[s.length - 1] ?? 0;
+    const delta = last - first;
+    const deltaPct = first ? Math.round(delta / first * 1000) / 10 : 0;
+    const color = delta > 0 ? 'var(--series-sf8)' : (delta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
+    return `<tr>
+      <td>${countryLabel[c]} (${c})</td>
+      <td class="num">${first}</td>
+      <td class="num">${last}</td>
+      <td class="num" style="color:${color}">${delta > 0 ? '+' : ''}${delta}</td>
+      <td class="num" style="color:${color}">${deltaPct > 0 ? '+' : ''}${deltaPct}%</td>
+    </tr>`;
+  }).join('');
+}
+
+renderTrends();
 render();
 </script>
 </body>

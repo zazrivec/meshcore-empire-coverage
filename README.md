@@ -19,12 +19,30 @@ Live stránka: https://zazrivec.github.io/meshcore-empire-coverage/
   4. dopočíta čerstvosť z `last_advert`,
   5. vyrenderuje `scripts/template.html` (s dátami vloženými ako inline JSON)
      do `index.html` v koreni repa — to je presne to, čo servíruje GitHub Pages.
+  6. uloží kompaktný denný súhrn (počty per krajina/preset, NIE plný zoznam
+     bodov) do `data/YYYY-MM-DD.json`,
+  7. prečíta celú históriu `data/*.json` a dopočíta trendové časové rady
+     (repeaterov v čase, celkovo aj per krajina), ktoré sa tiež vložia do
+     reportu (sekcia "Trendy", sparklines v dlaždiciach krajín).
 - `scripts/borders.json` — zjednodušené hranice krajín (z geoBoundaries.org,
   Douglas-Peucker zjednodušenie). Tieto sa nemenia denne, preto sú uložené
   staticky a build ich len číta — nefetchujú sa nanovo pri každom behu.
 - `scripts/template.html` — statická HTML/CSS/JS šablóna s placeholdermi
-  `__DATA__` (nahradí sa JSON dátami) a `__BUILD_DATE__` (nahradí sa časom
-  behu buildu v UTC).
+  `__DATA__` (nahradí sa JSON dátami vrátane trendov) a `__BUILD_DATE__`
+  (nahradí sa časom behu buildu v UTC).
+- `data/YYYY-MM-DD.json` — jeden súbor per deň, per-krajina totály a
+  preset-bucket rozpad (rádovo pár KB, nie celý point-list) — toto je
+  jediný zdroj histórie/trendov v projekte.
+
+### Prečo vlastná história a nie API map.meshcore.io?
+
+`map.meshcore.io/api/v1/nodes` je čistý **full-table dump aktuálneho stavu**
+— žiadne `limit`/`offset`/`since` parametre nefungujú (vždy vráti všetko) a
+neexistuje žiadny per-advert event log ani `/history`/`/events` endpoint
+(overené priamym probovaním API — jediné dva funkčné endpointy sú `GET
+/api/v1/nodes` a `GET /api/v1/nodes/<public_key>`, oba len "posledný známy
+stav"). Presné trendy sa z neho teda nedajú získať retroaktívne — jediná
+cesta je snímkovať si vlastnú históriu od teraz, čo robí `data/`.
 
 ## Ručné spustenie
 
@@ -34,14 +52,18 @@ Vyžaduje len Python 3 (žiadne `pip install`):
 python3 scripts/build.py
 ```
 
-Tým sa prepíše `index.html` v koreni repa čerstvými dátami. Commit a push
-(napr. na GitHub Pages) urob ručne:
+Tým sa prepíše `index.html` v koreni repa čerstvými dátami a pribudne/prepíše
+sa `data/<dnešný dátum>.json`. Commit a push (napr. na GitHub Pages) urob
+ručne:
 
 ```bash
-git add index.html
+git add index.html data/
 git commit -m "Manual data refresh"
 git push
 ```
+
+Ak build spustíš viackrát v ten istý deň, `data/<dnešný dátum>.json` sa len
+prepíše (jeden súbor = jeden deň), takže história nezíska duplicitné body.
 
 Pre kontrolu pred pushnutím stačí otvoriť `index.html` lokálne v prehliadači.
 
