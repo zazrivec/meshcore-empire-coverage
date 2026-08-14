@@ -1,0 +1,404 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MeshCore Coverage: SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR</title>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-N46ZGZSD7S"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-N46ZGZSD7S');
+</script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous" />
+<style>
+  :root {
+    color-scheme: light;
+    --surface-0: #faf9f6;
+    --surface-1: #ffffff;
+    --surface-2: #f1efe9;
+    --border: #ded9cd;
+    --text-primary: #1c1a15;
+    --text-secondary: #5c5748;
+    --text-muted: #8a8474;
+    --accent: #b5502f;
+    --series-sf7: #eb6834;
+    --series-sf8: #2a78d6;
+    --series-other: #1baf7a;
+    --status-stale: #e34948;
+    --chip-bg: #f1efe9;
+    --chip-active-bg: #1c1a15;
+    --chip-active-fg: #faf9f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+      --surface-0: #17150f;
+      --surface-1: #1e1c15;
+      --surface-2: #29261c;
+      --border: #3a3628;
+      --text-primary: #f3f0e7;
+      --text-secondary: #c3bda9;
+      --text-muted: #8f8973;
+      --accent: #e88a63;
+      --series-sf7: #d95926;
+      --series-sf8: #3987e5;
+      --series-other: #199e70;
+      --status-stale: #e66767;
+      --chip-bg: #29261c;
+      --chip-active-bg: #f3f0e7;
+      --chip-active-fg: #17150f;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--surface-0); }
+  body {
+    color: var(--text-primary);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.5;
+  }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 40px 24px 80px; }
+  h1 { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.01em; margin: 0 0 4px; }
+  .subtitle { color: var(--text-secondary); font-size: 0.95rem; margin: 0 0 28px; }
+  .meta-row { display: flex; gap: 18px; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 36px; padding-bottom: 16px; border-bottom: 1px solid var(--border); }
+  .meta-row b { color: var(--text-secondary); font-weight: 600; }
+
+  h2 { font-size: 1.15rem; font-weight: 700; margin: 44px 0 4px; }
+  .section-note { color: var(--text-secondary); font-size: 0.88rem; margin: 0 0 18px; max-width: 72ch; }
+
+  .callout {
+    background: var(--surface-2); border: 1px solid var(--border); border-left: 3px solid var(--accent);
+    border-radius: 6px; padding: 14px 16px; font-size: 0.88rem; color: var(--text-secondary); margin: 16px 0 28px;
+  }
+  .callout b { color: var(--text-primary); }
+
+  .filter-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+  .filter-bar .flabel { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.03em; }
+  .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip {
+    font-size: 0.8rem; font-weight: 600; padding: 6px 12px; border-radius: 999px;
+    background: var(--chip-bg); color: var(--text-secondary); border: 1px solid var(--border);
+    cursor: pointer; user-select: none; transition: background 0.12s, color 0.12s;
+  }
+  .chip:hover { border-color: var(--accent); }
+  .chip.active { background: var(--chip-active-bg); color: var(--chip-active-fg); border-color: var(--chip-active-bg); }
+
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px; }
+  .stat-tile { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+  .stat-tile .country { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; }
+  .stat-tile .count { font-size: 1.7rem; font-weight: 700; font-variant-numeric: tabular-nums; margin: 2px 0 6px; }
+  .stat-tile .dom { font-size: 0.78rem; color: var(--text-secondary); }
+  .stat-tile .dom b { color: var(--text-primary); }
+  .stat-tile .density { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; }
+  .stat-tile .density b { color: var(--text-primary); }
+
+  .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 20px; overflow-x: auto; }
+  .legend { display: flex; gap: 16px; flex-wrap: wrap; font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 14px; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+  .legend.clickable span {
+    cursor: pointer; user-select: none; padding: 4px 8px; border-radius: 6px;
+    background: var(--chip-bg); border: 1px solid var(--border); transition: opacity 0.12s;
+  }
+  .legend.clickable span:hover { border-color: var(--accent); }
+  .legend.clickable span.off { opacity: 0.4; }
+  .legend.clickable span.off i { background: var(--text-muted) !important; }
+
+  .bars { display: flex; flex-direction: column; gap: 12px; min-width: 480px; }
+  .bar-row { display: grid; grid-template-columns: 40px 1fr 52px; align-items: center; gap: 10px; font-size: 0.82rem; }
+  .bar-row .label { color: var(--text-secondary); font-weight: 600; }
+  .bar-track { display: flex; height: 18px; border-radius: 4px; overflow: hidden; background: var(--surface-2); }
+  .bar-seg { height: 100%; }
+  .bar-row .n { text-align: right; color: var(--text-muted); font-variant-numeric: tabular-nums; font-size: 0.78rem; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+  th { color: var(--text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.03em; }
+  td.num, th.num { text-align: right; }
+
+  .map-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px; margin-bottom: 20px; }
+  #map { width: 100%; height: 640px; border-radius: 6px; }
+  .leaflet-container { background: #dfe6e0; font-family: inherit; }
+
+  footer { margin-top: 48px; padding-top: 16px; border-top: 1px solid var(--border); font-size: 0.75rem; color: var(--text-muted); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Rádiové pokrytie MeshCore: 17 krajín Európy</h1>
+  <p class="subtitle">Repeatery zaradené do krajiny podľa GPS súradníc (point-in-polygon proti reálnym hraniciam); ak repeater súradnice nemá, dopĺňa sa podľa prefixu v názve. Lokálny build z dát map.meshcore.io.</p>
+
+  <div class="meta-row">
+    <div><b>Zdroj dát:</b> map.meshcore.io/api/v1/nodes</div>
+    <div><b>Presety:</b> api.meshcore.nz/api/v1/config</div>
+    <div><b>Hranice a mapový podklad:</b> OpenStreetMap / geoBoundaries.org</div>
+    <div><b>Stiahnuté:</b> __BUILD_DATE__</div>
+  </div>
+
+  <div class="callout" id="headline-callout"></div>
+
+  <div class="filter-bar">
+    <span class="flabel">Filter podľa čerstvosti advertu:</span>
+    <div class="chip-row" id="freshness-chips"></div>
+  </div>
+
+  <h2>Prehľad podľa krajiny</h2>
+  <p class="section-note" id="filter-echo"></p>
+  <p class="section-note">Hustota = počet repeaterov na 1000&nbsp;km² rozlohy krajiny. Reaguje na filter čerstvosti vyššie — pri prísnejšom okne (napr. ≤3&nbsp;dni) tak vidno hustotu <i>aktuálne živej</i> siete, nie celej historickej.</p>
+  <div class="stat-grid" id="stat-grid"></div>
+
+  <h2>Rozdelenie rádiových parametrov</h2>
+  <p class="section-note">Presety „Hungary&rdquo;, „Slovakia&rdquo; a „Netherlands&rdquo; v konfigurácii mapy majú <b>identické</b> rádio parametre (869.618&nbsp;MHz / BW&nbsp;62.5 / SF7 / CR5) — zoskupené podľa reálnych parametrov, nie mena presetu. Česko a Poľsko majú svoje vlastné výrazné kombinácie, preto majú samostatnú farbu.</p>
+  <div class="chart-wrap">
+    <div class="legend" id="preset-legend"></div>
+    <div class="bars" id="preset-bars"></div>
+  </div>
+
+  <h2>Mapa pokrytia</h2>
+  <p class="section-note">Interaktívna mapa (OpenStreetMap podklad, zoom/pan). Farba bodky = rádio preset. Filter čerstvosti vyššie reaguje aj tu. Klikni na preset v legende nižšie a vypni/zapni ho na mape.</p>
+  <div class="map-wrap">
+    <div class="legend" id="map-legend"></div>
+    <div id="map"></div>
+  </div>
+
+  <h2>Čerstvosť advertov (last_advert)</h2>
+  <p class="section-note">Rozdelenie podľa času od posledného rádiového advertu zachyteného mapou.</p>
+  <div class="chart-wrap">
+    <table>
+      <thead><tr><th>Krajina</th><th class="num">≤3 dni</th><th class="num">≤7 dní</th><th class="num">≤10 dní</th><th class="num">≤30 dní</th><th class="num">&gt;30 dní (stale)</th><th class="num">Spolu</th></tr></thead>
+      <tbody id="fresh-table"></tbody>
+    </table>
+  </div>
+
+  <h2>Zistenia</h2>
+  <div id="findings"></div>
+
+  <footer>Dáta z verejného API map.meshcore.io, api.meshcore.nz, OpenStreetMap a geoBoundaries.org — jednorazový lokálny snapshot, čísla sa menia s rastom siete.</footer>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
+<script id="data-json" type="application/json">__DATA__</script>
+<script>
+const DATA = JSON.parse(document.getElementById('data-json').textContent);
+const points = DATA.points; // {lat, lon, name, c, m, b, ad}
+const borders = DATA.borders || {};
+
+const countryOrder = ['SK','AT','HU','CZ','DE','SI','PL','IT','CH','BE','NL','LU','UA','DK','HR','RO','GR'];
+const countryLabel = { SK:'Slovensko', AT:'Rakúsko', HU:'Maďarsko', CZ:'Česko', DE:'Nemecko', SI:'Slovinsko', PL:'Poľsko', IT:'Taliansko', CH:'Švajčiarsko', BE:'Belgicko', NL:'Holandsko', LU:'Luxembursko', UA:'Ukrajina', DK:'Dánsko', HR:'Chorvátsko', RO:'Rumunsko', GR:'Grécko' };
+const BUCKETS = [
+  { key: 'sf8cr8',     label: 'SF8/CR8 · 869.618MHz',  desc: 'EU/UK Narrow, Switzerland',      color: '#2a78d6' },
+  { key: 'sf7cr5',     label: 'SF7/CR5 · 869.618MHz',  desc: 'Slovakia / Hungary / Netherlands', color: '#eb6834' },
+  { key: 'cz_narrow',  label: 'SF7/CR5 · 869.432MHz',  desc: 'Czech Republic (Narrow)',          color: '#1baf7a' },
+  { key: 'sf8cr5',     label: 'SF8/CR5 · 869.618MHz',  desc: 'bez oficiálneho mena',             color: '#eda100' },
+  { key: 'pl_sf6cr8',  label: 'SF6/CR8 · 869.618MHz',  desc: 'bez oficiálneho mena, takmer výhradne PL', color: '#e87ba4' },
+  { key: 'eu433',      label: '433MHz pásmo',          desc: 'EU 433MHz Narrow/Long Range, najmä IT',    color: '#4a3aa7' },
+  { key: 'sf7cr8',     label: 'SF7/CR8 · 869.618MHz',  desc: 'bez oficiálneho mena, takmer výhradne NL', color: '#008300' },
+  { key: 'eu_dep',     label: 'SF11/CR5 · BW250 · 869.525MHz', desc: 'EU/UK (Deprecated)',        color: '#e34948' },
+  { key: 'other',      label: 'Iné',                   desc: 'zvyšné/nezhodné kombinácie',      color: '#8a8474' },
+];
+const presetLabel = Object.fromEntries(BUCKETS.map(b => [b.key, b.label]));
+const colorFor = Object.fromEntries(BUCKETS.map(b => [b.key, b.color]));
+
+document.getElementById('preset-legend').innerHTML = BUCKETS.map(b =>
+  `<span title="${b.desc}"><i style="background:${b.color}"></i>${b.label}</span>`
+).join('');
+
+const activeBuckets = new Set(BUCKETS.map(b => b.key));
+document.getElementById('map-legend').className = 'legend clickable';
+document.getElementById('map-legend').innerHTML = BUCKETS.map(b =>
+  `<span title="${b.desc}" data-key="${b.key}"><i style="background:${b.color}"></i>${b.label}</span>`
+).join('');
+document.getElementById('map-legend').addEventListener('click', e => {
+  const el = e.target.closest('span');
+  if (!el) return;
+  const key = el.dataset.key;
+  if (activeBuckets.has(key)) activeBuckets.delete(key);
+  else activeBuckets.add(key);
+  el.classList.toggle('off', !activeBuckets.has(key));
+  renderMarkers(activeFilter);
+});
+
+const FILTERS = [
+  { key: 'all', label: 'Všetky', test: () => true },
+  { key: 'd3', label: '≤ 3 dni', test: ad => ad <= 3 },
+  { key: 'd7', label: '≤ 7 dní', test: ad => ad <= 7 },
+  { key: 'd10', label: '≤ 10 dní', test: ad => ad <= 10 },
+  { key: 'd30', label: '≤ 30 dní', test: ad => ad <= 30 },
+  { key: 'stale', label: '> 30 dní (stale)', test: ad => ad > 30 },
+];
+let activeFilter = 'd7';
+
+document.getElementById('freshness-chips').innerHTML = FILTERS.map(f =>
+  `<div class="chip${f.key===activeFilter ? ' active' : ''}" data-key="${f.key}">${f.label}</div>`
+).join('');
+
+function computeStats(filterKey) {
+  const filt = FILTERS.find(f => f.key === filterKey);
+  const stats = {};
+  for (const c of countryOrder) {
+    const pts = points.filter(p => p.c === c && filt.test(p.ad));
+    const counts = {};
+    for (const b of BUCKETS) counts[b.key] = pts.filter(p => p.b === b.key).length;
+    stats[c] = { total: pts.length, counts };
+  }
+  return stats;
+}
+const COUNTRY_AREA_KM2 = {
+  SK:49035, AT:83879, HU:93030, CZ:78871, DE:357022, SI:20273, PL:312696, IT:301340,
+  CH:41285, BE:30528, NL:41850, LU:2586, UA:603628, DK:42933, HR:56594, RO:238397, GR:131957,
+};
+// Density reacts to the freshness-chip selection, same as the count above it.
+let densityByCountry = {};
+function computeDensity(filterKey) {
+  const filtStats = computeStats(filterKey);
+  for (const c of countryOrder) {
+    const area = COUNTRY_AREA_KM2[c];
+    const total = filtStats[c].total;
+    densityByCountry[c] = (area && total) ? total / area * 1000 : 0; // repeaters per 1,000 km²
+  }
+}
+
+function dominant(s) {
+  if (s.total === 0) return { name: '—', pct: 0 };
+  const entries = BUCKETS.map(b => [b.label, s.counts[b.key]]);
+  entries.sort((a,b) => b[1]-a[1]);
+  const [name, n] = entries[0];
+  return { name, pct: Math.round(100*n/s.total) };
+}
+
+// ---- Leaflet map ----
+const map = L.map('map', { preferCanvas: true }).setView([49.0, 16.0], 4);
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '&copy; OpenStreetMap contributors',
+  maxZoom: 18,
+}).addTo(map);
+
+for (const [code, rings] of Object.entries(borders)) {
+  for (const ring of rings) {
+    if (ring.length < 3) continue;
+    L.polygon(ring.map(([lon,lat]) => [lat,lon]), {
+      color: '#5c5748', weight: 1, opacity: 0.5, fill: false,
+    }).addTo(map);
+  }
+}
+
+const markersLayer = L.layerGroup().addTo(map);
+
+function renderMarkers(filterKey) {
+  const filt = FILTERS.find(f => f.key === filterKey);
+  markersLayer.clearLayers();
+  for (const p of points) {
+    if (!filt.test(p.ad)) continue;
+    if (!activeBuckets.has(p.b)) continue;
+    const marker = L.circleMarker([p.lat, p.lon], {
+      radius: 4,
+      color: colorFor[p.b] || colorFor.other,
+      weight: 1,
+      opacity: 1,
+      fillColor: colorFor[p.b] || colorFor.other,
+      fillOpacity: 1,
+    });
+    marker.bindTooltip(
+      `<b>${p.name || '(bez názvu)'}</b><br>${countryLabel[p.c]} (${p.c}) · ${presetLabel[p.b] || 'iné'}<br>advert pred ${p.ad != null ? p.ad.toFixed(1) : '?'} dňami`,
+      { sticky: true }
+    );
+    marker.addTo(markersLayer);
+  }
+}
+
+function render() {
+  const stats = computeStats(activeFilter);
+  const filt = FILTERS.find(f => f.key === activeFilter);
+  computeDensity(activeFilter);
+
+  document.getElementById('filter-echo').textContent = activeFilter === 'all'
+    ? 'Zobrazené: všetky repeatery, bez ohľadu na čerstvosť advertu.'
+    : `Zobrazené: len repeatery s advertom „${filt.label.toLowerCase()}&rdquo;.`;
+
+  document.getElementById('stat-grid').innerHTML = countryOrder.map(c => {
+    const s = stats[c];
+    const d = dominant(s);
+    return `<div class="stat-tile">
+      <div class="country">${countryLabel[c]} (${c})</div>
+      <div class="count">${s.total}</div>
+      <div class="dom">dominantný preset: <b>${d.name}</b> ${s.total ? `(${d.pct}%)` : ''}</div>
+      <div class="density">hustota: <b>${densityByCountry[c].toFixed(2)}</b> rpt / 1000&nbsp;km²</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('preset-bars').innerHTML = countryOrder.map(c => {
+    const s = stats[c];
+    const track = s.total === 0 ? '' : BUCKETS.map(b => {
+      const n = s.counts[b.key];
+      const pct = 100*n/s.total;
+      return pct > 0 ? `<div class="bar-seg" style="width:${pct}%;background:${b.color}" title="${b.label}: ${n} (${pct.toFixed(1)}%)"></div>` : '';
+    }).join('');
+    return `<div class="bar-row"><div class="label">${c}</div><div class="bar-track">${track}</div><div class="n">${s.total}</div></div>`;
+  }).join('');
+
+  renderMarkers(activeFilter);
+}
+
+document.getElementById('freshness-chips').addEventListener('click', e => {
+  const chip = e.target.closest('.chip');
+  if (!chip) return;
+  activeFilter = chip.dataset.key;
+  document.querySelectorAll('#freshness-chips .chip').forEach(c => c.classList.toggle('active', c === chip));
+  render();
+});
+
+// Fixed freshness breakdown table (always full dataset)
+document.getElementById('fresh-table').innerHTML = countryOrder.map(c => {
+  const pts = points.filter(p => p.c === c);
+  const n3 = pts.filter(p => p.ad <= 3).length;
+  const n7 = pts.filter(p => p.ad <= 7).length;
+  const n10 = pts.filter(p => p.ad <= 10).length;
+  const n30 = pts.filter(p => p.ad <= 30).length;
+  const nStale = pts.filter(p => p.ad > 30).length;
+  return `<tr>
+    <td>${countryLabel[c]} (${c})</td>
+    <td class="num">${n3}</td><td class="num">${n7}</td><td class="num">${n10}</td><td class="num">${n30}</td>
+    <td class="num" style="color:var(--status-stale)">${nStale}</td><td class="num">${pts.length}</td>
+  </tr>`;
+}).join('');
+
+const allStats = computeStats('d7');
+function pct(country, key) {
+  const s = allStats[country];
+  return s.total ? Math.round(100*s.counts[key]/s.total) : 0;
+}
+document.getElementById('headline-callout').innerHTML =
+  `<b>Kľúčové zistenie</b> (počítané len z repeaterov s advertom za posledných ≤7&nbsp;dní — aktuálne živá sieť, nie historický súhrn): nejde len o dva tábory. SK je najviac <b>SF7/CR5</b> (${pct('SK','sf7cr5')}%), ` +
+  `AT/DE/SI sú najviac <b>SF8/CR8</b> (${pct('AT','sf8cr8')}% / ${pct('DE','sf8cr8')}% / ${pct('SI','sf8cr8')}%), ` +
+  `<b>CZ má takmer výhradne svoj vlastný preset</b> na inej frekvencii (869.432MHz, ${pct('CZ','cz_narrow')}%) a ` +
+  `<b>PL</b> je väčšinovo SF8/CR8 (${pct('PL','sf8cr8')}%) s výrazným vedľajším zhlukom SF6/CR8 (${pct('PL','pl_sf6cr8')}%), ktorý nemá oficiálny preset.`;
+
+document.getElementById('findings').innerHTML = `
+  <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;padding-left:20px">
+    <li><b>Zaradenie krajiny:</b> primárne podľa GPS (point-in-polygon voči reálnym hraniciam SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR), prefix v názve sa použije len ak repeater nemá súradnice — v aktuálnom datasete to nebol žiadny prípad, prefix fallback je teda len poistka do budúcna.</li>
+    <li><b>CZ (${allStats.CZ.total} repeaterov):</b> ${pct('CZ','cz_narrow')}% na 869.432MHz/SF7/CR5 („Czech Republic Narrow&rdquo;) — inak než všetci susedia, ktorí sedia na 869.618MHz. Český repeater sa nedomovie ani s SK/HU/NL presetom (rovnaké SF/CR, iná frekvencia), ani so SF8/CR8 blokom.</li>
+    <li><b>PL (${allStats.PL.total} repeaterov):</b> ${pct('PL','sf8cr8')}% SF8/CR8, ale ${pct('PL','pl_sf6cr8')}% (${allStats.PL.counts.pl_sf6cr8}) beží na SF6/CR8 — kombinácii, ktorá sa nenachádza v odporúčaných presetoch API a je takmer výhradne poľská (274/275 nájdených v celej osmičke).</li>
+    <li><b>DE (${allStats.DE.total} repeaterov):</b> najväčšia populácia v tejto osmičke, ${pct('DE','sf8cr8')}% SF8/CR8 — v súlade s AT a SI.</li>
+    <li><b>SK (${allStats.SK.total} repeaterov):</b> ${pct('SK','sf7cr5')}% SF7/CR5, ${pct('SK','sf8cr8')}% SF8/CR8.</li>
+    <li><b>HU (${allStats.HU.total} repeaterov):</b> najviac zmiešaná krajina — ${pct('HU','sf7cr5')}% SF7/CR5 vs ${pct('HU','sf8cr8')}% SF8/CR8, prechodová zóna medzi blokmi.</li>
+    <li><b>SI (${allStats.SI.total} repeaterov):</b> najmenšia vzorka, ${pct('SI','sf8cr8')}% SF8/CR8 — v súlade s AT/DE.</li>
+    <li><b>IT (${allStats.IT.total} repeaterov):</b> ${pct('IT','sf8cr8')}% SF8/CR8 (v súlade s AT/DE/SI), ale ${pct('IT','eu433')}% (${allStats.IT.counts.eu433}) beží na úplne inom frekvenčnom pásme — 433MHz (presety „EU 433MHz Narrow/Long Range&rdquo;) — namiesto bežných 868/869MHz. Tieto uzly sa nedomovia so žiadnym iným repeaterom v tejto analýze bez ohľadu na SF/CR shodu.</li>
+    <li><b>CH (${allStats.CH.total} repeaterov):</b> ${pct('CH','sf8cr8')}% SF8/CR8 — najčistejšie sa držiaca krajina AT/DE/SI/CH bloku.</li>
+    <li><b>NL (${allStats.NL.total} repeaterov) — najviac roztrieštená krajina v analýze:</b> ${pct('NL','sf7cr5')}% SF7/CR5 (preset „Netherlands&rdquo;, identický s SK/HU), ${pct('NL','sf8cr8')}% SF8/CR8, a navyše ${pct('NL','sf7cr8')}% (${allStats.NL.counts.sf7cr8} repeaterov) na SF7/CR8 — kombinácii bez oficiálneho mena, ktorá je takmer výhradne holandská. K tomu malý podiel „EU/UK Deprecated&rdquo; (SF11/CR5/BW250). Reálne teda ide o štyri súbežné, čiastočne nekompatibilné rádio-svety v jednej krajine.</li>
+    <li><b>BE (${allStats.BE.total} repeaterov):</b> ${pct('BE','sf8cr8')}% SF8/CR8 — v súlade s DE/CH, takmer žiadne SF7/CR5.</li>
+    <li><b>LU (${allStats.LU.total} repeaterov):</b> najmenšia vzorka, prakticky celá na SF8/CR8.</li>
+    <li><b>UA (${allStats.UA.total} repeaterov):</b> zatiaľ len ${allStats.UA.total} uzlov v datasete — príliš malá vzorka na spoľahlivý záver, ale zatiaľ prevažne SF8/CR8.</li>
+    <li><b>DK (${allStats.DK.total} repeaterov):</b> ${pct('DK','sf8cr8')}% SF8/CR8 — v súlade s DE/AT/CH blokom, prekvapivo veľká vzorka na dánsku sieť.</li>
+    <li><b>RO (${allStats.RO.total} repeaterov):</b> ${pct('RO','sf8cr8')}% SF8/CR8, podobne ako zvyšok SF8/CR8 bloku.</li>
+    <li><b>GR (${allStats.GR.total} repeaterov):</b> malá vzorka, ${pct('GR','sf8cr8')}% SF8/CR8.</li>
+    <li><b>HR (${allStats.HR.total} repeaterov):</b> najmenšia vzorka spomedzi všetkých 17 krajín, zatiaľ takmer celá SF8/CR8.</li>
+    <li><b>Cross-border dôsledok:</b> na spoločných hraniciach sa stretávajú minimálne tri nekompatibilné rádio-svety — SF7/CR5 (SK), SF8/CR8 (AT/DE/SI/väčšina PL) a Českom izolovaný 869.432MHz preset — bez ručnej zhody nastavení sa uzly medzi nimi nespoja, bez ohľadu na signál/dosah.</li>
+    <li><b>Čerstvosť:</b> všetky čísla vyššie sú počítané len z repeaterov s advertom za posledných ≤7&nbsp;dní. Chipy vyššie umožňujú prepnúť na iné okno (napr. „Všetky&rdquo; alebo „&gt;30&nbsp;dní&rdquo;) a porovnať, či sa obraz mení pri zahrnutí starších/opustených uzlov.</li>
+  </ul>
+`;
+
+render();
+</script>
+</body>
+</html>

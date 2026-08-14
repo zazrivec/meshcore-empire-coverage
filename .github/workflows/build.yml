@@ -1,0 +1,41 @@
+name: Build and deploy coverage report
+
+on:
+  schedule:
+    # 04:15 UTC every day
+    - cron: '15 4 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: build-deploy
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run build (fetch fresh data, render index.html)
+        run: python3 scripts/build.py
+
+      - name: Commit and push if index.html changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          if git diff --cached --quiet; then
+            echo "No changes to index.html, nothing to commit."
+          else
+            git commit -m "Automated daily data refresh"
+            git push
+          fi
