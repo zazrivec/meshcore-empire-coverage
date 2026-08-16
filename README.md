@@ -26,6 +26,15 @@ Live stránka: https://zazrivec.github.io/meshcore-empire-coverage/
      reportu (sekcia "Trendy" — celkovo aj per krajina — a "Trendy podľa
      presetu", ktorá ukazuje, ktoré rádio presety v sieti rastú a ktoré
      ubúdajú; plus sparklines v dlaždiciach krajín).
+  8. z tých istých agregovaných denných počtov (prvý vs posledný deň v
+     `data/`) dopočíta Sankey diagram **"Migrácia medzi presetmi"** —
+     `reconcile_flow()` v `build.py` nájde najmenšiu realokáciu medzi
+     presetmi, ktorá vysvetlí zmenu súhrnných počtov. **Toto nie je
+     sledovanie konkrétnych uzlov** (ani map.meshcore.io, ani tento build
+     pubkey naprieč dňami netrackuje) — je to odvodený/pravdepodobný obraz,
+     nie pozorovaná migrácia. Zdieľa rovnaký prepínač krajiny ("Všetky"
+     alebo konkrétna z 17) so sekciou "Trendy podľa presetu" — zmena na
+     jednom mieste sa prejaví aj v druhom.
 - `scripts/borders.json` — zjednodušené hranice krajín (z geoBoundaries.org,
   Douglas-Peucker zjednodušenie). Tieto sa nemenia denne, preto sú uložené
   staticky a build ich len číta — nefetchujú sa nanovo pri každom behu.

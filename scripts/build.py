@@ -20,6 +20,11 @@ full-table dump with no working pagination/since filters, and there is no
 per-node advert log) — this daily snapshot is how this project builds its own
 trend history over time.
 
+The "preset migration" Sankey (see reconcile_flow/build_migration below) is
+derived from these same aggregate daily counts, NOT from tracking individual
+nodes across days — it's a plausible-minimum-reallocation view of what the
+count deltas imply, spanning the same date range as the trend charts.
+
 Output:
     index.html        (repo root — this is what GitHub Pages serves)
     data/YYYY-MM-DD.json   (daily summary snapshot, accumulated over time)
@@ -40,6 +45,9 @@ NODES_API_URL = "https://map.meshcore.io/api/v1/nodes?short=1"
 TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
 BORDERS_PATH = SCRIPTS_DIR / "borders.json"
 OUTPUT_PATH = REPO_ROOT / "index.html"
+
+NEW_KEY = "_new_"        # synthetic source in the migration Sankey: net growth not explained by any shrinking bucket
+REMOVED_KEY = "_removed_"  # synthetic target: net shrinkage not absorbed by any growing bucket
 
 COUNTRIES = ["SK", "AT", "HU", "CZ", "DE", "SI", "PL", "IT",
              "CH", "BE", "NL", "LU", "UA", "DK", "HR", "RO", "GR"]
@@ -210,7 +218,7 @@ def load_history():
     if not DATA_DIR.exists():
         return []
     history = []
-    for f in sorted(DATA_DIR.glob("*.json")):
+    for f in sorted(DATA_DIR.glob("[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9].json")):
         try:
             history.append(json.loads(f.read_text(encoding="utf-8")))
         except (json.JSONDecodeError, OSError) as e:
@@ -229,12 +237,17 @@ def build_trends(history):
 
     country_totals = {c: [] for c in COUNTRIES}
     bucket_totals = {k: [] for k in BUCKET_KEYS}
+    # Per-country preset trend: countryBucketTotals[country][bucket] = [count per day]
+    country_bucket_totals = {c: {k: [] for k in BUCKET_KEYS} for c in COUNTRIES}
 
     for h in history:
         by_country = h.get("by_country", {})
         for c in COUNTRIES:
             row = by_country.get(c)
             country_totals[c].append(row["total"] if row else 0)
+            row_buckets = row["buckets"] if row else {}
+            for k in BUCKET_KEYS:
+                country_bucket_totals[c][k].append(row_buckets.get(k, 0))
         day_bucket_sums = {k: 0 for k in BUCKET_KEYS}
         for row in by_country.values():
             for k, v in row.get("buckets", {}).items():
@@ -248,11 +261,104 @@ def build_trends(history):
         "grandTotal": grand_total,
         "countryTotals": country_totals,
         "bucketTotals": bucket_totals,
+        "countryBucketTotals": country_bucket_totals,
     }
 
 
-def render(points, borders, trends):
-    data = {"points": points, "borders": borders, "trends": trends}
+def reconcile_flow(counts_from, counts_to, bucket_keys):
+    """Turn two aggregate bucket-count snapshots (start/end of the tracked
+    window) into an IMPLIED minimum-reallocation flow matrix — NOT an
+    observed per-node migration (map.meshcore.io/this build don't track
+    individual pubkeys across days, only aggregate counts per day). This is
+    the same kind of reconciliation used to explain balance-sheet deltas: as
+    much as possible is kept on the diagonal (bucket unchanged), remaining
+    shrinkage is greedily matched to remaining growth elsewhere, leftover
+    shrinkage becomes REMOVED_KEY and leftover growth becomes NEW_KEY.
+
+    Two genuinely different real-world stories can produce an identical pair
+    of aggregate snapshots (e.g. simultaneous A->B and B->A churn nets out to
+    zero and is invisible here) — this is a lower-bound/plausible-explanation
+    view, not a ground truth of who moved where."""
+    matrix = {}
+
+    def bump(frm, to, n):
+        if n <= 0:
+            return
+        matrix.setdefault(frm, {})
+        matrix[frm][to] = matrix[frm].get(to, 0) + n
+
+    remaining_source = {b: counts_from.get(b, 0) for b in bucket_keys}
+    remaining_sink = {b: counts_to.get(b, 0) for b in bucket_keys}
+
+    for b in bucket_keys:
+        diag = min(remaining_source[b], remaining_sink[b])
+        if diag > 0:
+            bump(b, b, diag)
+            remaining_source[b] -= diag
+            remaining_sink[b] -= diag
+
+    sources = [[b, v] for b, v in remaining_source.items() if v > 0]
+    sinks = [[b, v] for b, v in remaining_sink.items() if v > 0]
+    i = j = 0
+    while i < len(sources) and j < len(sinks):
+        sb, sv = sources[i]
+        tb, tv = sinks[j]
+        n = min(sv, tv)
+        bump(sb, tb, n)
+        sources[i][1] -= n
+        sinks[j][1] -= n
+        if sources[i][1] == 0:
+            i += 1
+        if sinks[j][1] == 0:
+            j += 1
+
+    while i < len(sources):
+        if sources[i][1] > 0:
+            bump(sources[i][0], REMOVED_KEY, sources[i][1])
+        i += 1
+    while j < len(sinks):
+        if sinks[j][1] > 0:
+            bump(NEW_KEY, sinks[j][0], sinks[j][1])
+        j += 1
+
+    return matrix
+
+
+def build_migration(trends):
+    """Preset-migration Sankey data, spanning the exact same date range as
+    the "Trendy podľa presetu" chart (first tracked day -> most recent
+    build) — computed purely from the aggregate daily snapshots already in
+    data/, via reconcile_flow(). Returns matrix=None if there's under 2 days
+    of history yet."""
+    dates = trends["dates"]
+    if len(dates) < 2:
+        return {"matrix": None, "byCountry": {}, "fromDate": None, "toDate": None,
+                "bucketKeys": BUCKET_KEYS, "newKey": NEW_KEY, "removedKey": REMOVED_KEY}
+
+    global_from = {k: trends["bucketTotals"][k][0] for k in BUCKET_KEYS}
+    global_to = {k: trends["bucketTotals"][k][-1] for k in BUCKET_KEYS}
+    global_matrix = reconcile_flow(global_from, global_to, BUCKET_KEYS)
+
+    by_country = {}
+    for c in COUNTRIES:
+        cbt = trends["countryBucketTotals"].get(c, {})
+        c_from = {k: (cbt.get(k) or [0])[0] for k in BUCKET_KEYS}
+        c_to = {k: (cbt.get(k) or [0])[-1] for k in BUCKET_KEYS}
+        by_country[c] = reconcile_flow(c_from, c_to, BUCKET_KEYS)
+
+    return {
+        "matrix": global_matrix,
+        "byCountry": by_country,
+        "fromDate": dates[0],
+        "toDate": dates[-1],
+        "bucketKeys": BUCKET_KEYS,
+        "newKey": NEW_KEY,
+        "removedKey": REMOVED_KEY,
+    }
+
+
+def render(points, borders, trends, migration):
+    data = {"points": points, "borders": borders, "trends": trends, "migration": migration}
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     build_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
     html = template.replace("__DATA__", json.dumps(data)).replace("__BUILD_DATE__", build_date)
@@ -277,7 +383,13 @@ def main():
     trends = build_trends(history)
     log(f"trend history spans {len(history)} day(s): {trends['dates'][:1]}..{trends['dates'][-1:]}")
 
-    html = render(points, borders, trends)
+    migration = build_migration(trends)
+    if migration["fromDate"]:
+        log(f"migration Sankey spans {migration['fromDate']} -> {migration['toDate']} (reconciled from aggregate daily counts)")
+    else:
+        log("not enough history yet for a migration Sankey (need >=2 days)")
+
+    html = render(points, borders, trends, migration)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     log(f"wrote {OUTPUT_PATH} ({len(html):,} bytes)")
 

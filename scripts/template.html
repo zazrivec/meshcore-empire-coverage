@@ -27,6 +27,7 @@
     --series-sf8: #2a78d6;
     --series-other: #1baf7a;
     --status-stale: #e34948;
+    --migration-new: #64748b;
     --chip-bg: #f1efe9;
     --chip-active-bg: #1c1a15;
     --chip-active-fg: #faf9f6;
@@ -46,6 +47,7 @@
       --series-sf8: #3987e5;
       --series-other: #199e70;
       --status-stale: #e66767;
+      --migration-new: #94a3b8;
       --chip-bg: #29261c;
       --chip-active-bg: #f3f0e7;
       --chip-active-fg: #17150f;
@@ -190,7 +192,11 @@
   <p class="section-note" id="trends-empty" style="display:none">Zatiaľ je k dispozícii len jeden denný snapshot — história sa buduje s každým ďalším behom buildu (denne cez GitHub Action, alebo ručne). Vráť sa o pár dní.</p>
 
   <h3 id="preset-trends-heading" style="font-size:1rem;font-weight:700;margin:28px 0 4px;display:none">Trendy podľa presetu</h3>
-  <p class="section-note" id="preset-trends-note" style="display:none">Súčet naprieč všetkými 17 krajinami, per preset, v čase — ukazuje čo v sieti reálne pribúda a čo uberá (napr. či prechod na nový preset naozaj prebieha, alebo je to len šum jednotlivých dní).</p>
+  <p class="section-note" id="preset-trends-note" style="display:none">Vyber krajinu (alebo „Všetky&rdquo; pre súčet naprieč celou analýzou) a sleduj, ktorý rádio preset v čase pribúda a ktorý ubúda — napr. či prechod na nový preset naozaj prebieha, alebo je to len šum jednotlivých dní.</p>
+  <div class="filter-bar" id="preset-trends-scope-wrap" style="display:none">
+    <span class="flabel">Krajina:</span>
+    <div class="chip-row" id="preset-trends-scope-chips"></div>
+  </div>
   <div class="chart-wrap" id="preset-trends-chart-wrap" style="display:none">
     <div class="legend" id="preset-trends-legend"></div>
     <svg class="mapsvg" id="presettrendsvg" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -201,6 +207,19 @@
       <tbody id="preset-trends-table"></tbody>
     </table>
   </div>
+
+  <h3 id="migration-heading" style="font-size:1rem;font-weight:700;margin:28px 0 4px;display:none">Migrácia medzi presetmi</h3>
+  <p class="section-note" id="migration-note" style="display:none">
+Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — rovnaký dátumový rozsah ako „Trendy podľa presetu&rdquo; vyššie. <b>Toto nie je sledovanie konkrétnych uzlov</b> (to build ani map.meshcore.io neposkytuje) — je to najmenšia možná realokácia, ktorá vysvetlí zmenu súhrnných počtov medzi prvým a posledným dňom: čo sa dá vysvetliť ako "zostalo na tom istom presete", zostáva na diagonále; zvyšný pokles v jednom presete sa spáruje so zvyšným rastom v inom. Ak sa v tom istom období preset A zmenšil o X a B narástol o X len náhodou (nie skutočným presunom), graf to napriek tomu ukáže ako tok A→B — realita mohla byť iná (napr. časť A odišla úplne zo siete a B pribudlo z nových uzlov). Ľavý stĺpec = preset na začiatku obdobia, pravý stĺpec = na konci. Hrúbka pásu = počet repeaterov. Sivá „Nové&rdquo;/„Zmizli&rdquo; nie sú presety, len zvyšok rastu/poklesu, ktorý sa nedal spárovať s inou zmenou — zámerne neutrálne odtiene šedej, aby sa nepliedli s reálnou farbou žiadneho presetu.
+  </p>
+  <div class="filter-bar" id="migration-scope-wrap" style="display:none">
+    <span class="flabel">Krajina:</span>
+    <div class="chip-row" id="migration-scope-chips"></div>
+  </div>
+  <div class="chart-wrap" id="migration-chart-wrap" style="display:none">
+    <svg class="mapsvg" id="migrationsvg" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg"></svg>
+  </div>
+  <p class="section-note" id="migration-empty" style="display:none">Migrácia medzi presetmi potrebuje aspoň 2 dni denných snapshotov (rovnako ako „Trendy podľa presetu&rdquo; vyššie) — zatiaľ je k dispozícii len jeden deň. Vráť sa po ďalšom builde.</p>
 
   <h2>Zistenia</h2>
   <div id="findings"></div>
@@ -531,17 +550,57 @@ function renderTrends() {
   }).join('');
 }
 
+// Shared across both "Trendy podľa presetu" and "Migrácia" — switching the
+// country in either place switches it in both, so they always tell the same
+// story for the same scope.
+const COUNTRY_SCOPES = [{ key: 'ALL', label: 'Všetky' }, ...countryOrder.map(c => ({ key: c, label: c }))];
+let activeCountryScope = 'ALL';
+const countryScopeListeners = [];
+function onCountryScopeChange(fn) { countryScopeListeners.push(fn); }
+function setCountryScope(key) {
+  activeCountryScope = key;
+  countryScopeListeners.forEach(fn => fn(key));
+}
+function renderCountryScopeChips(containerId) {
+  const el = document.getElementById(containerId);
+  el.innerHTML = COUNTRY_SCOPES.map(s =>
+    `<div class="chip${s.key === activeCountryScope ? ' active' : ''}" data-key="${s.key}">${s.label}</div>`
+  ).join('');
+  el.addEventListener('click', e => {
+    const chip = e.target.closest('.chip');
+    if (!chip) return;
+    setCountryScope(chip.dataset.key);
+  });
+  onCountryScopeChange(key => {
+    el.querySelectorAll('.chip').forEach(c => c.classList.toggle('active', c.dataset.key === key));
+  });
+}
+
+function seriesForScope(scope, bucketKey) {
+  if (scope === 'ALL') return trends.bucketTotals[bucketKey] || [];
+  return (trends.countryBucketTotals && trends.countryBucketTotals[scope] && trends.countryBucketTotals[scope][bucketKey]) || [];
+}
+
 function renderPresetTrends() {
   const n = trends.dates.length;
   if (n < 2 || !trends.bucketTotals) return;
 
   document.getElementById('preset-trends-heading').style.display = '';
   document.getElementById('preset-trends-note').style.display = '';
+  document.getElementById('preset-trends-scope-wrap').style.display = '';
   document.getElementById('preset-trends-chart-wrap').style.display = '';
   document.getElementById('preset-trends-table-wrap').style.display = '';
 
+  if (!document.getElementById('preset-trends-scope-chips').childElementCount) {
+    renderCountryScopeChips('preset-trends-scope-chips');
+    onCountryScopeChange(() => renderPresetTrends());
+  }
+
+  const scope = activeCountryScope;
+  const scopeLabel = scope === 'ALL' ? 'všetky krajiny' : `${countryLabel[scope] || scope} (${scope})`;
+
   const W = 900, H = 260, PAD = 30;
-  const allValues = BUCKETS.flatMap(b => trends.bucketTotals[b.key] || []);
+  const allValues = BUCKETS.flatMap(b => seriesForScope(scope, b.key));
   const max = Math.max(...allValues, 1);
   const min = 0;
   const range = (max - min) || 1;
@@ -558,9 +617,11 @@ function renderPresetTrends() {
   axis.setAttribute('stroke', 'var(--border)');
   svg.appendChild(axis);
 
+  let anySeriesDrawn = false;
   for (const b of BUCKETS) {
-    const series = trends.bucketTotals[b.key] || [];
+    const series = seriesForScope(scope, b.key);
     if (!series.length || series.every(v => v === 0)) continue;
+    anySeriesDrawn = true;
     const pts = series.map((v, i) => xy(i, v).map(x => x.toFixed(1)).join(',')).join(' ');
     const poly = document.createElementNS(svgns, 'polyline');
     poly.setAttribute('points', pts);
@@ -594,12 +655,12 @@ function renderPresetTrends() {
   lastLabel.textContent = trends.dates[trends.dates.length - 1];
   svg.appendChild(lastLabel);
 
-  document.getElementById('preset-trends-legend').innerHTML = BUCKETS.map(b =>
-    `<span title="${b.desc}"><i style="background:${b.color}"></i>${b.label}</span>`
-  ).join('');
+  document.getElementById('preset-trends-legend').innerHTML =
+    `<span style="font-weight:600">${scopeLabel}${!anySeriesDrawn ? ' — žiadne dáta pre toto obdobie' : ''}</span>` +
+    BUCKETS.map(b => `<span title="${b.desc}"><i style="background:${b.color}"></i>${b.label}</span>`).join('');
 
   const rows = BUCKETS.map(b => {
-    const s = trends.bucketTotals[b.key] || [];
+    const s = seriesForScope(scope, b.key);
     const first = s[0] ?? 0, last = s[s.length - 1] ?? 0;
     const delta = last - first;
     const deltaPct = first ? Math.round(delta / first * 1000) / 10 : (last ? Infinity : 0);
@@ -619,8 +680,167 @@ function renderPresetTrends() {
   }).join('');
 }
 
+// ---- Preset migration Sankey (who moved from what preset to what) ----
+const migration = DATA.migration || { matrix: null, byCountry: {}, fromDate: null, toDate: null };
+const MIGRATION_NEW = migration.newKey || '_new_';
+const MIGRATION_REMOVED = migration.removedKey || '_removed_';
+
+function bucketColorFor(key) {
+  if (key === MIGRATION_NEW) return 'var(--migration-new)';
+  if (key === MIGRATION_REMOVED) return 'var(--text-muted)';
+  const b = BUCKETS.find(b => b.key === key);
+  return b ? b.color : 'var(--text-muted)';
+}
+function bucketLabelFor(key) {
+  if (key === MIGRATION_NEW) return 'Nové';
+  if (key === MIGRATION_REMOVED) return 'Zmizli';
+  const b = BUCKETS.find(b => b.key === key);
+  return b ? b.label : key;
+}
+function matrixForMigrationScope(scope) {
+  if (scope === 'ALL') return migration.matrix;
+  return (migration.byCountry && migration.byCountry[scope]) || {};
+}
+
+function renderMigration() {
+  if (!migration.matrix || !Object.keys(migration.matrix).length) {
+    document.getElementById('migration-empty').style.display = '';
+    return;
+  }
+
+  document.getElementById('migration-heading').style.display = '';
+  document.getElementById('migration-note').style.display = '';
+  document.getElementById('migration-scope-wrap').style.display = '';
+  document.getElementById('migration-chart-wrap').style.display = '';
+  document.getElementById('migration-since').textContent = `${migration.fromDate || '?'} → ${migration.toDate || '?'}`;
+
+  if (!document.getElementById('migration-scope-chips').childElementCount) {
+    renderCountryScopeChips('migration-scope-chips');
+    onCountryScopeChange(() => renderMigration());
+  }
+
+  const matrix = matrixForMigrationScope(activeCountryScope);
+  const bucketKeys = migration.bucketKeys || BUCKETS.map(b => b.key);
+  const leftOrder = [MIGRATION_NEW, ...bucketKeys];
+  const rightOrder = [...bucketKeys, MIGRATION_REMOVED];
+
+  const leftTotals = {}, rightTotals = {};
+  for (const frm of leftOrder) {
+    leftTotals[frm] = Object.values(matrix[frm] || {}).reduce((a, v) => a + v, 0);
+  }
+  for (const to of rightOrder) {
+    rightTotals[to] = leftOrder.reduce((sum, frm) => sum + ((matrix[frm] || {})[to] || 0), 0);
+  }
+
+  const rawTotal = Object.values(leftTotals).reduce((a, v) => a + v, 0);
+  const svg = document.getElementById('migrationsvg');
+  const svgns = 'http://www.w3.org/2000/svg';
+  svg.innerHTML = '';
+
+  if (rawTotal === 0) {
+    const msg = document.createElementNS(svgns, 'text');
+    msg.setAttribute('x', 450); msg.setAttribute('y', 230); msg.setAttribute('text-anchor', 'middle');
+    msg.setAttribute('font-size', '13'); msg.setAttribute('fill', 'var(--text-muted)');
+    msg.textContent = 'Zatiaľ žiadne zaznamenané zmeny pre túto krajinu.';
+    svg.appendChild(msg);
+    return;
+  }
+
+  const grandTotal = rawTotal;
+  const W = 900, H = 460, PAD = 20, NODE_W = 14, LABEL_GUTTER = 130;
+  const colGap = W - 2 * PAD - 2 * NODE_W - 2 * LABEL_GUTTER;
+  const xLeft = PAD + LABEL_GUTTER, xRight = xLeft + NODE_W + colGap;
+  const usableH = H - 2 * PAD;
+  const scale = usableH / grandTotal;
+
+  function drawColumn(order, totals, x, align) {
+    let y = PAD;
+    const positions = {};
+    for (const key of order) {
+      const h = totals[key] * scale;
+      if (h > 0.15) {
+        const rect = document.createElementNS(svgns, 'rect');
+        rect.setAttribute('x', x); rect.setAttribute('y', y.toFixed(1));
+        rect.setAttribute('width', NODE_W); rect.setAttribute('height', h.toFixed(1));
+        rect.setAttribute('fill', bucketColorFor(key));
+        rect.setAttribute('rx', '2');
+        const t = document.createElementNS(svgns, 'title');
+        t.textContent = `${bucketLabelFor(key)}: ${totals[key]}`;
+        rect.appendChild(t);
+        svg.appendChild(rect);
+
+        if (h > 9) {
+          const label = document.createElementNS(svgns, 'text');
+          label.setAttribute('y', (y + h / 2 + 3.5).toFixed(1));
+          label.setAttribute('font-size', '11');
+          label.setAttribute('fill', 'var(--text-secondary)');
+          if (align === 'left') {
+            label.setAttribute('x', x - 8);
+            label.setAttribute('text-anchor', 'end');
+          } else {
+            label.setAttribute('x', x + NODE_W + 8);
+          }
+          label.textContent = `${bucketLabelFor(key)} (${totals[key]})`;
+          svg.appendChild(label);
+        }
+      }
+      positions[key] = { y0: y, h };
+      y += h;
+    }
+    return positions;
+  }
+
+  const leftPos = drawColumn(leftOrder, leftTotals, xLeft, 'left');
+  const rightPos = drawColumn(rightOrder, rightTotals, xRight, 'right');
+
+  const rightCursor = {};
+  for (const to of rightOrder) rightCursor[to] = rightPos[to].y0;
+
+  for (const frm of leftOrder) {
+    let cursor = leftPos[frm].y0;
+    const outgoing = matrix[frm] || {};
+    for (const to of rightOrder) {
+      const n = outgoing[to] || 0;
+      if (n <= 0) continue;
+      const h = n * scale;
+      const y0a = cursor, y1a = cursor + h;
+      const y0b = rightCursor[to], y1b = rightCursor[to] + h;
+      cursor += h;
+      rightCursor[to] += h;
+      if (h < 0.15) continue;
+
+      const x0 = xLeft + NODE_W, x1 = xRight;
+      const xm = (x0 + x1) / 2;
+      const path = document.createElementNS(svgns, 'path');
+      const d = `M${x0},${y0a} C${xm},${y0a} ${xm},${y0b} ${x1},${y0b} ` +
+                `L${x1},${y1b} C${xm},${y1b} ${xm},${y1a} ${x0},${y1a} Z`;
+      path.setAttribute('d', d);
+      path.setAttribute('fill', bucketColorFor(frm));
+      path.setAttribute('opacity', frm === to ? '0.25' : '0.45');
+      const t = document.createElementNS(svgns, 'title');
+      t.textContent = `${bucketLabelFor(frm)} → ${bucketLabelFor(to)}: ${n}`;
+      path.appendChild(t);
+      svg.appendChild(path);
+    }
+  }
+
+  const colLabelY = 12;
+  const leftColLabel = document.createElementNS(svgns, 'text');
+  leftColLabel.setAttribute('x', xLeft); leftColLabel.setAttribute('y', colLabelY);
+  leftColLabel.setAttribute('font-size', '11'); leftColLabel.setAttribute('fill', 'var(--text-muted)');
+  leftColLabel.textContent = `Predtým (${migration.fromDate || '?'})`;
+  svg.appendChild(leftColLabel);
+  const rightColLabel = document.createElementNS(svgns, 'text');
+  rightColLabel.setAttribute('x', xRight + NODE_W); rightColLabel.setAttribute('y', colLabelY);
+  rightColLabel.setAttribute('font-size', '11'); rightColLabel.setAttribute('fill', 'var(--text-muted)');
+  rightColLabel.setAttribute('text-anchor', 'end');
+  rightColLabel.textContent = `Teraz (${migration.toDate || '?'})`;
+  svg.appendChild(rightColLabel);
+}
+
 renderTrends();
 renderPresetTrends();
+renderMigration();
 render();
 </script>
 </body>
