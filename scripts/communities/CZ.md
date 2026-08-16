@@ -1,5 +1,15 @@
 ## Česko
 
-Zatiaľ nezmapované. Ak vieš o miestnej MeshCore komunite/koordinačnej stránke pre Česko, priprav PR do `scripts/communities/CZ.md`.
+- [meshcore.cz](https://meshcore.cz/) — hlavný český hub.
+- [forum.meshcore.website](https://forum.meshcore.website/) — komunitné fórum.
+- [mapa.meshcore.cz](https://mapa.meshcore.cz/) — mapa siete.
+- [pokryti.meshcore.cz](https://pokryti.meshcore.cz/) — mapa pokrytia.
+- [analyzer.meshcore.cz](https://analyzer.meshcore.cz/) — analyzátor siete.
+- [meshcore.node.cz](https://meshcore.node.cz/) — informácie o uzloch.
+- [t.me/meshcore_cz](https://t.me/meshcore_cz) — Telegram skupina.
+- [blog.eischmann.cz — Úvod do MeshCore](https://blog.eischmann.cz/2026/02/15/uvod-do-meshcore/)
+- [petanovo.cz — MeshCore, opensource komunikační síť](https://www.petanovo.cz/meshcore-opensource-komunikacni-sit/)
+- [chiptron.cz — MeshCore jako nekompatibilní alternativa k Meshtastic, jak jej nastavit](https://chiptron.cz/meshcore-jako-nekompatibilni-alternativa-k-meshtastic-jak-jej-nastavit-abyste-si-mohli-psat/)
+- [amaterskeradio.cz — MeshCore vs. Meshtastic](https://amaterskeradio.cz/cs/meshcore-vs-meschtastic/)
 
-Skús aj celoeurópsky rozcestník: [meshcoreeurope.org/community](https://meshcoreeurope.org/en/community/).
+Český preset (869.432MHz/BW62.5/SF7/CR5, "Czech Republic Narrow") beží na inej frekvencii než okolité SK/HU/NL aj AT/DE/SI blok — pozri sekciu "Rozdelenie rádiových parametrov" vyššie.
