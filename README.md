@@ -35,6 +35,15 @@ Live stránka: https://zazrivec.github.io/meshcore-empire-coverage/
      nie pozorovaná migrácia. Zdieľa rovnaký prepínač krajiny ("Všetky"
      alebo konkrétna z 17) so sekciou "Trendy podľa presetu" — zmena na
      jednom mieste sa prejaví aj v druhom.
+  9. prečíta `scripts/communities/<KÓD>.md` (jeden súbor per krajina zo
+     zoznamu `COUNTRIES`), skonvertuje cez zámerne minimálny markdown→HTML
+     konvertor (`render_markdown()` — len nadpisy, odrážky, **bold**,
+     `[text](url)` odkazy, žiadna externá závislosť) a vloží do sekcie
+     "Komunitné a koordinačné stránky" na konci reportu. Toto sú externé,
+     komunitou spravované zdroje (fóra, wiki, mapy) pre budovanie MeshCore
+     siete v danej krajine — nie obsah tohto projektu. Pokrytie je zámerne
+     postupné (zatiaľ SK/AT/HU/NL má reálny obsah, zvyšok placeholder) —
+     doplnenie ďalšej krajiny je len úprava jej `.md` súboru.
 - `scripts/borders.json` — zjednodušené hranice krajín (z geoBoundaries.org,
   Douglas-Peucker zjednodušenie). Tieto sa nemenia denne, preto sú uložené
   staticky a build ich len číta — nefetchujú sa nanovo pri každom behu.

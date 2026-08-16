@@ -32,6 +32,7 @@ Output:
 No third-party dependencies — stdlib only, so it runs unmodified in CI.
 """
 import json
+import re
 import sys
 import urllib.request
 from datetime import datetime, timezone
@@ -44,6 +45,7 @@ DATA_DIR = REPO_ROOT / "data"
 NODES_API_URL = "https://map.meshcore.io/api/v1/nodes?short=1"
 TEMPLATE_PATH = SCRIPTS_DIR / "template.html"
 BORDERS_PATH = SCRIPTS_DIR / "borders.json"
+COMMUNITIES_DIR = SCRIPTS_DIR / "communities"
 OUTPUT_PATH = REPO_ROOT / "index.html"
 
 NEW_KEY = "_new_"        # synthetic source in the migration Sankey: net growth not explained by any shrinking bucket
@@ -357,11 +359,101 @@ def build_migration(trends):
     }
 
 
-def render(points, borders, trends, migration):
+def render_markdown(md_text):
+    """Deliberately tiny markdown -> HTML converter: headings (#/##/###),
+    unordered lists (- item), **bold**, [text](url) links, and paragraphs.
+    NOT a full CommonMark implementation — just enough for the hand-authored
+    community pages in scripts/communities/. No nested lists."""
+
+    def esc(s):
+        return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+    def inline(s):
+        s = esc(s)
+        s = re.sub(r"\*\*(.+?)\*\*", r"<strong>\1</strong>", s)
+        s = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r'<a href="\2" target="_blank" rel="noopener">\1</a>', s)
+        return s
+
+    html_parts = []
+    in_list = False
+    paragraph_buf = []
+
+    def flush_paragraph():
+        if paragraph_buf:
+            html_parts.append("<p>" + " ".join(paragraph_buf) + "</p>")
+            paragraph_buf.clear()
+
+    def close_list():
+        nonlocal in_list
+        if in_list:
+            html_parts.append("</ul>")
+            in_list = False
+
+    for raw_line in md_text.strip("\n").split("\n"):
+        line = raw_line.strip()
+        if not line:
+            flush_paragraph()
+            close_list()
+            continue
+        heading = re.match(r"^(#{1,3})\s+(.*)$", line)
+        list_item = re.match(r"^[-*]\s+(.*)$", line)
+        if heading:
+            flush_paragraph()
+            close_list()
+            level = min(len(heading.group(1)) + 2, 6)  # md h1 -> html h3, stays subordinate to page's own h2s
+            html_parts.append(f"<h{level}>{inline(heading.group(2))}</h{level}>")
+        elif list_item:
+            flush_paragraph()
+            if not in_list:
+                html_parts.append("<ul>")
+                in_list = True
+            html_parts.append(f"<li>{inline(list_item.group(1))}</li>")
+        else:
+            close_list()
+            paragraph_buf.append(inline(line))
+
+    flush_paragraph()
+    close_list()
+    return "\n".join(html_parts)
+
+
+def load_community_pages():
+    """Read scripts/communities/<CODE>.md for every known country code and
+    convert to HTML. Returns {country_code: html} for whichever files exist,
+    in COUNTRIES order; unknown filenames are skipped with a log line."""
+    pages = {}
+    if not COMMUNITIES_DIR.exists():
+        return pages
+    known = set(COUNTRIES)
+    for f in sorted(COMMUNITIES_DIR.glob("*.md")):
+        code = f.stem
+        if code not in known:
+            log(f"skipping scripts/communities/{f.name} — {code!r} is not a known country code")
+            continue
+        pages[code] = render_markdown(f.read_text(encoding="utf-8"))
+    return {c: pages[c] for c in COUNTRIES if c in pages}
+
+
+def render(points, borders, trends, migration, communities):
     data = {"points": points, "borders": borders, "trends": trends, "migration": migration}
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     build_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    html = template.replace("__DATA__", json.dumps(data)).replace("__BUILD_DATE__", build_date)
+
+    country_label = {  # kept in sync with countryLabel in template.html's JS
+        "SK": "Slovensko", "AT": "Rakúsko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Nemecko",
+        "SI": "Slovinsko", "PL": "Poľsko", "IT": "Taliansko", "CH": "Švajčiarsko", "BE": "Belgicko",
+        "NL": "Holandsko", "LU": "Luxembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvátsko",
+        "RO": "Rumunsko", "GR": "Grécko",
+    }
+    community_cards = "\n".join(
+        f'<div class="community-card"><div class="community-card-header">{country_label.get(c, c)} ({c})</div>{html}</div>'
+        for c, html in communities.items()
+    )
+
+    html = (template
+            .replace("__DATA__", json.dumps(data))
+            .replace("__BUILD_DATE__", build_date)
+            .replace("__COMMUNITY_HTML__", community_cards))
     return html
 
 
@@ -389,7 +481,10 @@ def main():
     else:
         log("not enough history yet for a migration Sankey (need >=2 days)")
 
-    html = render(points, borders, trends, migration)
+    communities = load_community_pages()
+    log(f"loaded {len(communities)}/{len(COUNTRIES)} community pages from scripts/communities/")
+
+    html = render(points, borders, trends, migration, communities)
     OUTPUT_PATH.write_text(html, encoding="utf-8")
     log(f"wrote {OUTPUT_PATH} ({len(html):,} bytes)")
 

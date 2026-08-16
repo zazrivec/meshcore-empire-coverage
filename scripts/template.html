@@ -96,6 +96,15 @@
   .stat-tile .density b { color: var(--text-primary); }
   .spark-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
   .spark { width: 70px; height: 20px; flex-shrink: 0; }
+
+  .community-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .community-card { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 16px 18px; font-size: 0.85rem; color: var(--text-secondary); }
+  .community-card-header { font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
+  .community-card h3, .community-card h4, .community-card h5 { display: none; } /* country name already shown in community-card-header */
+  .community-card p { margin: 0 0 8px; }
+  .community-card ul { margin: 0 0 8px; padding-left: 18px; }
+  .community-card li { margin-bottom: 4px; }
+  .community-card a { color: var(--accent); }
   .spark-delta { font-size: 0.72rem; font-variant-numeric: tabular-nums; }
 
   .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 20px; overflow-x: auto; }
@@ -223,6 +232,10 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
 
   <h2>Zistenia</h2>
   <div id="findings"></div>
+
+  <h2>Komunitné a koordinačné stránky</h2>
+  <p class="section-note">Externé, komunitou spravované zdroje pre budovanie a nastavenie MeshCore siete v danej krajine (nie obsah tohto projektu) — hubov, fóra, wiki, mapy. Pokrytie je zámerne postupné; ak vieš o miestnej stránke, ktorá tu chýba, priprav PR do <code>scripts/communities/&lt;KÓD&gt;.md</code>.</p>
+  <div class="community-grid">__COMMUNITY_HTML__</div>
 
   <footer>Dáta z verejného API map.meshcore.io, api.meshcore.nz, OpenStreetMap a geoBoundaries.org — jednorazový lokálny snapshot, čísla sa menia s rastom siete. Historické trendy sú vlastná dátová sada tohto projektu (denné snapshoty v <code>data/</code>), nie z API map.meshcore.io — to samo históriu neposkytuje (žiadny per-advert event log, len aktuálny stav uzla).</footer>
 </div>
