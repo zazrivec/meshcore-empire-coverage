@@ -233,9 +233,14 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
   <h2>Zistenia</h2>
   <div id="findings"></div>
 
-  <h2>Komunitné a koordinačné stránky</h2>
-  <p class="section-note">Externé, komunitou spravované zdroje pre budovanie a nastavenie MeshCore siete v danej krajine (nie obsah tohto projektu) — hubov, fóra, wiki, mapy. Pokrytie je zámerne postupné; ak vieš o miestnej stránke, ktorá tu chýba, priprav PR do <code>scripts/communities/&lt;KÓD&gt;.md</code>.</p>
-  <div class="community-grid">__COMMUNITY_HTML__</div>
+  <div class="filter-bar">
+    <h2 id="community-heading" style="margin:0"></h2>
+    <span style="flex-grow:1"></span>
+    <label id="community-lang-label" style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.03em"></label>
+    <select id="community-lang-select" class="chip" style="cursor:pointer"></select>
+  </div>
+  <p class="section-note" id="community-intro"></p>
+  <div class="community-grid" id="community-grid"></div>
 
   <footer>Dáta z verejného API map.meshcore.io, api.meshcore.nz, OpenStreetMap a geoBoundaries.org — jednorazový lokálny snapshot, čísla sa menia s rastom siete. Historické trendy sú vlastná dátová sada tohto projektu (denné snapshoty v <code>data/</code>), nie z API map.meshcore.io — to samo históriu neposkytuje (žiadny per-advert event log, len aktuálny stav uzla).</footer>
 </div>
@@ -851,9 +856,60 @@ function renderMigration() {
   svg.appendChild(rightColLabel);
 }
 
+// ---- Community pages i18n (only this section is localized — rest of the
+// page stays Slovak) ----
+const communities = DATA.communities || {};
+const communityStrings = DATA.communityStrings || {};
+const countryNames = DATA.countryNames || {};
+const LANG_STORAGE_KEY = 'meshcore-community-lang';
+const availableLangs = DATA.languages || Object.keys(communityStrings);
+const defaultLang = DATA.defaultLang || 'sk';
+
+function detectInitialLang() {
+  const saved = localStorage.getItem(LANG_STORAGE_KEY);
+  if (saved && availableLangs.includes(saved)) return saved;
+  const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
+  if (availableLangs.includes(browserLang)) return browserLang;
+  return defaultLang;
+}
+
+let activeCommunityLang = detectInitialLang();
+
+function renderCommunities() {
+  const lang = availableLangs.includes(activeCommunityLang) ? activeCommunityLang : defaultLang;
+  const strings = communityStrings[lang] || communityStrings[defaultLang] || {};
+  const names = countryNames[lang] || countryNames[defaultLang] || {};
+  const pages = communities[lang] || {};
+
+  document.getElementById('community-heading').textContent = strings.heading || '';
+  document.getElementById('community-intro').textContent = strings.intro || '';
+  document.getElementById('community-lang-label').textContent = strings.lang_select_label || '';
+
+  const select = document.getElementById('community-lang-select');
+  if (!select.childElementCount) {
+    select.innerHTML = availableLangs.map(l =>
+      `<option value="${l}">${(communityStrings[l] || {}).lang_name || l}</option>`
+    ).join('');
+    select.addEventListener('change', () => {
+      activeCommunityLang = select.value;
+      localStorage.setItem(LANG_STORAGE_KEY, activeCommunityLang);
+      renderCommunities();
+    });
+  }
+  select.value = lang;
+
+  document.getElementById('community-grid').innerHTML = countryOrder.map(c => {
+    const html = pages[c];
+    if (!html) return '';
+    const name = names[c] || c;
+    return `<div class="community-card"><div class="community-card-header">${name} (${c})</div>${html}</div>`;
+  }).join('');
+}
+
 renderTrends();
 renderPresetTrends();
 renderMigration();
+renderCommunities();
 render();
 </script>
 </body>

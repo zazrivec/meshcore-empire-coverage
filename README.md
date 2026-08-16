@@ -35,15 +35,23 @@ Live stránka: https://zazrivec.github.io/meshcore-empire-coverage/
      nie pozorovaná migrácia. Zdieľa rovnaký prepínač krajiny ("Všetky"
      alebo konkrétna z 17) so sekciou "Trendy podľa presetu" — zmena na
      jednom mieste sa prejaví aj v druhom.
-  9. prečíta `scripts/communities/<KÓD>.md` (jeden súbor per krajina zo
-     zoznamu `COUNTRIES`), skonvertuje cez zámerne minimálny markdown→HTML
+  9. prečíta `scripts/communities/<jazyk>/<KÓD>.md` pre každú kombináciu
+     jazyk × krajina, skonvertuje cez zámerne minimálny markdown→HTML
      konvertor (`render_markdown()` — len nadpisy, odrážky, **bold**,
-     `[text](url)` odkazy, žiadna externá závislosť) a vloží do sekcie
-     "Komunitné a koordinačné stránky" na konci reportu. Toto sú externé,
-     komunitou spravované zdroje (fóra, wiki, mapy) pre budovanie MeshCore
-     siete v danej krajine — nie obsah tohto projektu. Pokrytie je zámerne
-     postupné (zatiaľ SK/AT/HU/NL má reálny obsah, zvyšok placeholder) —
-     doplnenie ďalšej krajiny je len úprava jej `.md` súboru.
+     `[text](url)` odkazy, žiadna externá závislosť) a vloží do `DATA` JSON
+     blobu ako `communities`/`communityStrings`/`countryNames`. Sekcia
+     "Komunitné a koordinačné stránky" je **jediná lokalizovaná časť
+     stránky** — má prepínač jazyka (auto-detekcia `navigator.language` +
+     ručný dropdown, voľba sa pamätá cez `localStorage`), zvyšok reportu
+     (grafy, nadpisy, findings) zostáva po slovensky. Podporované jazyky:
+     `sk` (default, všetkých 17 krajín), `en` (fallback, všetkých 17),
+     `de`/`hu`/`cs`/`nl` (len relevantné krajiny — AT/DE/CH, HU, CZ, NL/BE).
+     Fallback reťazec `<jazyk> → en → sk` sa vyrieši už v `build.py`
+     (`load_community_bundles()`), klientský JS ho len zobrazí. Toto sú
+     externé, komunitou spravované zdroje (fóra, wiki, mapy) pre budovanie
+     MeshCore siete v danej krajine — nie obsah tohto projektu. Doplnenie
+     ďalšej krajiny/jazyka je len pridanie `.md` súboru do príslušného
+     jazykového podpriečinka.
 - `scripts/borders.json` — zjednodušené hranice krajín (z geoBoundaries.org,
   Douglas-Peucker zjednodušenie). Tieto sa nemenia denne, preto sú uložené
   staticky a build ich len číta — nefetchujú sa nanovo pri každom behu.

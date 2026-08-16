@@ -48,6 +48,54 @@ BORDERS_PATH = SCRIPTS_DIR / "borders.json"
 COMMUNITIES_DIR = SCRIPTS_DIR / "communities"
 OUTPUT_PATH = REPO_ROOT / "index.html"
 
+# Only the "Community & coordination pages" section is localized — the rest of
+# the report (charts, headings, findings) stays Slovak. sk has all 17 country
+# files authored directly; en is a full translated fallback for all 17; the
+# other languages only translate the countries most relevant to them (see
+# scripts/communities/<lang>/ — missing files fall back to en, then sk).
+LANGUAGES = ["sk", "en", "de", "hu", "cs", "nl"]
+DEFAULT_LANG = "sk"
+FALLBACK_LANG = "en"
+
+UI_STRINGS = {
+    "sk": {
+        "lang_name": "Slovenčina",
+        "heading": "Komunitné a koordinačné stránky",
+        "intro": "Externé, komunitou spravované zdroje pre budovanie a nastavenie MeshCore siete v danej krajine (nie obsah tohto projektu) — hubov, fóra, wiki, mapy. Pokrytie je zámerne postupné; ak vieš o miestnej stránke, ktorá tu chýba, priprav PR do scripts/communities/<jazyk>/<KÓD>.md.",
+        "lang_select_label": "Jazyk:",
+    },
+    "en": {
+        "lang_name": "English",
+        "heading": "Community & coordination pages",
+        "intro": "External, community-maintained resources for building and configuring the MeshCore network in a given country (not content of this project) — hubs, forums, wikis, maps. Coverage is intentionally incremental; if you know of a local page missing here, please open a PR against scripts/communities/<lang>/<CODE>.md.",
+        "lang_select_label": "Language:",
+    },
+    "de": {
+        "lang_name": "Deutsch",
+        "heading": "Community- und Koordinationsseiten",
+        "intro": "Externe, von der Community gepflegte Ressourcen zum Aufbau und zur Konfiguration des MeshCore-Netzwerks im jeweiligen Land (nicht Inhalt dieses Projekts) — Hubs, Foren, Wikis, Karten. Die Abdeckung wächst bewusst schrittweise; wenn du eine hier fehlende lokale Seite kennst, erstelle bitte einen PR gegen scripts/communities/<lang>/<CODE>.md.",
+        "lang_select_label": "Sprache:",
+    },
+    "hu": {
+        "lang_name": "Magyar",
+        "heading": "Közösségi és koordinációs oldalak",
+        "intro": "Külső, a közösség által karbantartott források a MeshCore hálózat kiépítéséhez és beállításához az adott országban (nem ennek a projektnek a tartalma) — közösségi oldalak, fórumok, wikik, térképek. A lefedettség szándékosan fokozatosan bővül; ha ismersz egy itt hiányzó helyi oldalt, kérjük készíts PR-t a scripts/communities/<lang>/<CODE>.md fájlhoz.",
+        "lang_select_label": "Nyelv:",
+    },
+    "cs": {
+        "lang_name": "Čeština",
+        "heading": "Komunitní a koordinační stránky",
+        "intro": "Externí, komunitou spravované zdroje pro budování a nastavení sítě MeshCore v dané zemi (nikoliv obsah tohoto projektu) — huby, fóra, wiki, mapy. Pokrytí je záměrně postupné; pokud víš o místní stránce, která zde chybí, připrav PR do scripts/communities/<lang>/<CODE>.md.",
+        "lang_select_label": "Jazyk:",
+    },
+    "nl": {
+        "lang_name": "Nederlands",
+        "heading": "Community- en coördinatiepagina's",
+        "intro": "Externe, door de community onderhouden bronnen voor het opbouwen en configureren van het MeshCore-netwerk in het betreffende land (geen inhoud van dit project) — hubs, forums, wiki's, kaarten. De dekking groeit bewust stap voor stap; als je een hier ontbrekende lokale pagina kent, maak dan een PR tegen scripts/communities/<lang>/<CODE>.md.",
+        "lang_select_label": "Taal:",
+    },
+}
+
 NEW_KEY = "_new_"        # synthetic source in the migration Sankey: net growth not explained by any shrinking bucket
 REMOVED_KEY = "_removed_"  # synthetic target: net shrinkage not absorbed by any growing bucket
 
@@ -417,43 +465,73 @@ def render_markdown(md_text):
     return "\n".join(html_parts)
 
 
-def load_community_pages():
-    """Read scripts/communities/<CODE>.md for every known country code and
-    convert to HTML. Returns {country_code: html} for whichever files exist,
-    in COUNTRIES order; unknown filenames are skipped with a log line."""
-    pages = {}
-    if not COMMUNITIES_DIR.exists():
-        return pages
-    known = set(COUNTRIES)
-    for f in sorted(COMMUNITIES_DIR.glob("*.md")):
-        code = f.stem
-        if code not in known:
-            log(f"skipping scripts/communities/{f.name} — {code!r} is not a known country code")
+COUNTRY_NAMES = {
+    "sk": {"SK": "Slovensko", "AT": "Rakúsko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Nemecko",
+           "SI": "Slovinsko", "PL": "Poľsko", "IT": "Taliansko", "CH": "Švajčiarsko", "BE": "Belgicko",
+           "NL": "Holandsko", "LU": "Luxembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvátsko",
+           "RO": "Rumunsko", "GR": "Grécko"},
+    "en": {"SK": "Slovakia", "AT": "Austria", "HU": "Hungary", "CZ": "Czechia", "DE": "Germany",
+           "SI": "Slovenia", "PL": "Poland", "IT": "Italy", "CH": "Switzerland", "BE": "Belgium",
+           "NL": "Netherlands", "LU": "Luxembourg", "UA": "Ukraine", "DK": "Denmark", "HR": "Croatia",
+           "RO": "Romania", "GR": "Greece"},
+    "de": {"SK": "Slowakei", "AT": "Österreich", "HU": "Ungarn", "CZ": "Tschechien", "DE": "Deutschland",
+           "SI": "Slowenien", "PL": "Polen", "IT": "Italien", "CH": "Schweiz", "BE": "Belgien",
+           "NL": "Niederlande", "LU": "Luxemburg", "UA": "Ukraine", "DK": "Dänemark", "HR": "Kroatien",
+           "RO": "Rumänien", "GR": "Griechenland"},
+    "hu": {"SK": "Szlovákia", "AT": "Ausztria", "HU": "Magyarország", "CZ": "Csehország", "DE": "Németország",
+           "SI": "Szlovénia", "PL": "Lengyelország", "IT": "Olaszország", "CH": "Svájc", "BE": "Belgium",
+           "NL": "Hollandia", "LU": "Luxemburg", "UA": "Ukrajna", "DK": "Dánia", "HR": "Horvátország",
+           "RO": "Románia", "GR": "Görögország"},
+    "cs": {"SK": "Slovensko", "AT": "Rakousko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Německo",
+           "SI": "Slovinsko", "PL": "Polsko", "IT": "Itálie", "CH": "Švýcarsko", "BE": "Belgie",
+           "NL": "Nizozemsko", "LU": "Lucembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvatsko",
+           "RO": "Rumunsko", "GR": "Řecko"},
+    "nl": {"SK": "Slowakije", "AT": "Oostenrijk", "HU": "Hongarije", "CZ": "Tsjechië", "DE": "Duitsland",
+           "SI": "Slovenië", "PL": "Polen", "IT": "Italië", "CH": "Zwitserland", "BE": "België",
+           "NL": "Nederland", "LU": "Luxemburg", "UA": "Oekraïne", "DK": "Denemarken", "HR": "Kroatië",
+           "RO": "Roemenië", "GR": "Griekenland"},
+}
+
+
+def load_community_bundles():
+    """Read scripts/communities/<lang>/<CODE>.md for every language x country
+    combination. Fallback chain per (lang, code): that language's own file ->
+    en/<CODE>.md -> sk/<CODE>.md. Returns {lang: {country_code: html}}, with
+    the fallback already resolved (client JS doesn't need its own logic)."""
+    raw = {}
+    for lang in LANGUAGES:
+        lang_dir = COMMUNITIES_DIR / lang
+        raw[lang] = {}
+        if not lang_dir.exists():
             continue
-        pages[code] = render_markdown(f.read_text(encoding="utf-8"))
-    return {c: pages[c] for c in COUNTRIES if c in pages}
+        for f in lang_dir.glob("*.md"):
+            code = f.stem
+            if code not in COUNTRIES:
+                log(f"skipping scripts/communities/{lang}/{f.name} — {code!r} is not a known country code")
+                continue
+            raw[lang][code] = render_markdown(f.read_text(encoding="utf-8"))
+
+    bundles = {lang: {} for lang in LANGUAGES}
+    for lang in LANGUAGES:
+        for code in COUNTRIES:
+            html = raw[lang].get(code) or raw.get(FALLBACK_LANG, {}).get(code) or raw.get(DEFAULT_LANG, {}).get(code)
+            if html is not None:
+                bundles[lang][code] = html
+    return bundles
 
 
 def render(points, borders, trends, migration, communities):
-    data = {"points": points, "borders": borders, "trends": trends, "migration": migration}
+    data = {
+        "points": points, "borders": borders, "trends": trends, "migration": migration,
+        "communities": communities, "communityStrings": UI_STRINGS, "countryNames": COUNTRY_NAMES,
+        "languages": LANGUAGES, "defaultLang": DEFAULT_LANG,
+    }
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     build_date = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
-    country_label = {  # kept in sync with countryLabel in template.html's JS
-        "SK": "Slovensko", "AT": "Rakúsko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Nemecko",
-        "SI": "Slovinsko", "PL": "Poľsko", "IT": "Taliansko", "CH": "Švajčiarsko", "BE": "Belgicko",
-        "NL": "Holandsko", "LU": "Luxembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvátsko",
-        "RO": "Rumunsko", "GR": "Grécko",
-    }
-    community_cards = "\n".join(
-        f'<div class="community-card"><div class="community-card-header">{country_label.get(c, c)} ({c})</div>{html}</div>'
-        for c, html in communities.items()
-    )
-
     html = (template
             .replace("__DATA__", json.dumps(data))
-            .replace("__BUILD_DATE__", build_date)
-            .replace("__COMMUNITY_HTML__", community_cards))
+            .replace("__BUILD_DATE__", build_date))
     return html
 
 
@@ -481,8 +559,9 @@ def main():
     else:
         log("not enough history yet for a migration Sankey (need >=2 days)")
 
-    communities = load_community_pages()
-    log(f"loaded {len(communities)}/{len(COUNTRIES)} community pages from scripts/communities/")
+    communities = load_community_bundles()
+    for lang in LANGUAGES:
+        log(f"community bundle '{lang}': {len(communities[lang])}/{len(COUNTRIES)} countries resolved")
 
     html = render(points, borders, trends, migration, communities)
     OUTPUT_PATH.write_text(html, encoding="utf-8")

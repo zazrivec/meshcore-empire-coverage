@@ -5,28 +5,28 @@
         "cz_narrow": 0,
         "eu433": 0,
         "eu_dep": 1,
-        "other": 32,
+        "other": 38,
         "pl_sf6cr8": 0,
-        "sf7cr5": 11,
+        "sf7cr5": 12,
         "sf7cr8": 0,
-        "sf8cr5": 93,
-        "sf8cr8": 442
+        "sf8cr5": 86,
+        "sf8cr8": 441
       },
-      "total": 579
+      "total": 578
     },
     "BE": {
       "buckets": {
         "cz_narrow": 0,
         "eu433": 5,
         "eu_dep": 1,
-        "other": 11,
+        "other": 10,
         "pl_sf6cr8": 0,
         "sf7cr5": 2,
         "sf7cr8": 0,
-        "sf8cr5": 27,
-        "sf8cr8": 566
+        "sf8cr5": 35,
+        "sf8cr8": 561
       },
-      "total": 612
+      "total": 614
     },
     "CH": {
       "buckets": {
@@ -37,14 +37,14 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 121,
-        "sf8cr8": 644
+        "sf8cr5": 109,
+        "sf8cr8": 661
       },
-      "total": 766
+      "total": 771
     },
     "CZ": {
       "buckets": {
-        "cz_narrow": 801,
+        "cz_narrow": 803,
         "eu433": 0,
         "eu_dep": 0,
         "other": 6,
@@ -54,7 +54,7 @@
         "sf8cr5": 0,
         "sf8cr8": 3
       },
-      "total": 811
+      "total": 813
     },
     "DE": {
       "buckets": {
@@ -63,12 +63,12 @@
         "eu_dep": 20,
         "other": 13,
         "pl_sf6cr8": 0,
-        "sf7cr5": 7,
+        "sf7cr5": 9,
         "sf7cr8": 0,
-        "sf8cr5": 1034,
-        "sf8cr8": 5191
+        "sf8cr5": 1057,
+        "sf8cr8": 5189
       },
-      "total": 6277
+      "total": 6300
     },
     "DK": {
       "buckets": {
@@ -79,10 +79,10 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 28,
-        "sf8cr8": 568
+        "sf8cr5": 30,
+        "sf8cr8": 569
       },
-      "total": 598
+      "total": 601
     },
     "GR": {
       "buckets": {
@@ -107,10 +107,10 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 1,
-        "sf8cr8": 23
+        "sf8cr5": 2,
+        "sf8cr8": 21
       },
-      "total": 24
+      "total": 23
     },
     "HU": {
       "buckets": {
@@ -135,10 +135,10 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 48,
-        "sf8cr8": 591
+        "sf8cr5": 22,
+        "sf8cr8": 619
       },
-      "total": 735
+      "total": 737
     },
     "LU": {
       "buckets": {
@@ -149,8 +149,8 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 5,
-        "sf8cr8": 72
+        "sf8cr5": 4,
+        "sf8cr8": 73
       },
       "total": 77
     },
@@ -159,28 +159,28 @@
         "cz_narrow": 2,
         "eu433": 7,
         "eu_dep": 11,
-        "other": 9,
+        "other": 8,
         "pl_sf6cr8": 0,
-        "sf7cr5": 1604,
-        "sf7cr8": 192,
-        "sf8cr5": 40,
+        "sf7cr5": 1633,
+        "sf7cr8": 170,
+        "sf8cr5": 43,
         "sf8cr8": 585
       },
-      "total": 2450
+      "total": 2459
     },
     "PL": {
       "buckets": {
         "cz_narrow": 0,
         "eu433": 4,
         "eu_dep": 6,
-        "other": 33,
-        "pl_sf6cr8": 280,
+        "other": 25,
+        "pl_sf6cr8": 281,
         "sf7cr5": 8,
         "sf7cr8": 1,
-        "sf8cr5": 247,
-        "sf8cr8": 2110
+        "sf8cr5": 234,
+        "sf8cr8": 2136
       },
-      "total": 2689
+      "total": 2695
     },
     "RO": {
       "buckets": {
@@ -191,10 +191,10 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 12,
-        "sf8cr8": 155
+        "sf8cr5": 8,
+        "sf8cr8": 161
       },
-      "total": 171
+      "total": 173
     },
     "SI": {
       "buckets": {
@@ -205,10 +205,10 @@
         "pl_sf6cr8": 0,
         "sf7cr5": 0,
         "sf7cr8": 0,
-        "sf8cr5": 6,
+        "sf8cr5": 7,
         "sf8cr8": 67
       },
-      "total": 73
+      "total": 74
     },
     "SK": {
       "buckets": {
@@ -217,12 +217,12 @@
         "eu_dep": 0,
         "other": 0,
         "pl_sf6cr8": 0,
-        "sf7cr5": 227,
+        "sf7cr5": 229,
         "sf7cr8": 9,
         "sf8cr5": 34,
         "sf8cr8": 53
       },
-      "total": 331
+      "total": 333
     },
     "UA": {
       "buckets": {
@@ -240,6 +240,6 @@
     }
   },
   "date": "2026-08-16",
-  "generated_at": "2026-08-16T11:09:05.962404+00:00",
-  "total_repeaters": 16448
+  "generated_at": "2026-08-16T20:11:34.736503+00:00",
+  "total_repeaters": 16503
 }
