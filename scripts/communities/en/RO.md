@@ -1,8 +1,10 @@
 ## Romania
 
-Not mapped yet. If you know of a local MeshCore community or coordination page for Romania, please open a PR against `scripts/communities/sk/RO.md` (and its language variants).
-
-Try the pan-European hub instead: [meshcoreeurope.org/community](https://meshcoreeurope.org/en/community/).
+- [meshcore.com.ro](https://meshcore.com.ro/) — main Romanian hub.
+- [map.meshcore.com.ro](https://map.meshcore.com.ro/) — network map.
+- [meshcore.com.ro/blog](https://meshcore.com.ro/blog/) — blog.
+- [map.meshcore.io (view centred on Romania)](https://map.meshcore.io/?lat=45.9&lon=24.9&zoom=6) — official global map, zoomed to Romania.
+- [meshcore.gg](https://meshcore.gg/) — community tool/portal.
 
 **Command for the network's dominant preset** (~90.8% of nodes):
 

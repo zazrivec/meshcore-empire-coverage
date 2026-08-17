@@ -7,7 +7,6 @@
 - [tools.meshview.dk](https://tools.meshview.dk/) — nástroje.
 - [meshhub.dk](https://www.meshhub.dk/) — komunitný hub.
 - [meshhub.dk/radio-settings](https://www.meshhub.dk/radio-settings/) — rádiové nastavenia.
-- [meshcoreeurope.org/da/map](https://meshcoreeurope.org/da/map/) — celoeurópska mapa (dánska verzia).
 - [map.meshcore.io](https://map.meshcore.io/) — oficiálna globálna mapa.
 - [Discord](https://discord.gg/ceu3nmcUBK) — komunitný Discord server.
 - [MeshCore Quick Start Guide (dánsky, PDF)](https://www.meshhub.dk/wp-content/uploads/2026/07/MeshCore_Quick_Start_Guide-App-Dansk.pdf)
