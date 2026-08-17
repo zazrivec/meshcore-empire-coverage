@@ -2,6 +2,7 @@
 <html>
 <head>
 <meta charset="utf-8">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A1%3C/text%3E%3C/svg%3E">
 <title>MeshCore Coverage: SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N46ZGZSD7S"></script>
@@ -930,7 +931,7 @@ function renderCommunities() {
   const names = countryNames[lang] || countryNames[defaultLang] || {};
   const pages = communities[lang] || {};
 
-  document.getElementById('community-heading').textContent = strings.heading || '';
+  document.getElementById('komunity').textContent = strings.heading || '';
   document.getElementById('community-intro').textContent = strings.intro || '';
   document.getElementById('community-lang-label').textContent = strings.lang_select_label || '';
 
@@ -955,11 +956,19 @@ function renderCommunities() {
   }).join('');
 }
 
-renderTrends();
-renderPresetTrends();
-renderMigration();
-renderCommunities();
-render();
+// Each section renders independently — a bug in one (e.g. a stale element
+// id) must not throw and silently skip every render call still queued after
+// it in this script (that's exactly what happened before: a broken
+// renderCommunities() reference took the map and stat tiles down with it,
+// since render() was queued right after it in the same synchronous block).
+function safeRender(name, fn) {
+  try { fn(); } catch (e) { console.error(`[render] ${name} failed:`, e); }
+}
+safeRender('renderTrends', renderTrends);
+safeRender('renderPresetTrends', renderPresetTrends);
+safeRender('renderMigration', renderMigration);
+safeRender('renderCommunities', renderCommunities);
+safeRender('render', render);
 
 // Re-apply the #hash scroll after everything above has rendered — the map,
 // charts and tables all add height to the page as they populate, which can
