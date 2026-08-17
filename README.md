@@ -130,7 +130,15 @@ index.html?country=SK&fresh=d7&lang=en#trendy
 - `#<id>` — naskroluje na sekciu po dorenderovaní obsahu (nie na natívne
   prehliadačové správanie, keďže mapa/grafy pridávajú výšku stránky až po
   načítaní). Dostupné id: `prehlad`, `presety`, `mapa`, `cerstvost`,
-  `trendy`, `zistenia`, `komunity`.
+  `trendy`, `preset-trends-heading`, `migration-heading`, `zistenia`,
+  `komunity`.
+
+Netreba tento odkaz skladať ručne — priamo pri filtroch v sekciách
+"Prehľad podľa krajiny", "Trendy podľa presetu", "Migrácia medzi presetmi" a
+"Komunitné a koordinačné stránky" je tlačidlo **🔗 Kopírovať odkaz**, ktoré
+skopíruje do schránky presne tento tvar URL s aktuálne zvoleným filtrom
+(krajina/čerstvosť/jazyk) danej sekcie a jej kotvou (`copyShareLink()` v
+`template.html`).
 
 Implementácia: `URL_PARAMS` (parsovaný z `location.search` na začiatku
 skriptu v `template.html`) sa použije pri inicializácii `activeFilter`,

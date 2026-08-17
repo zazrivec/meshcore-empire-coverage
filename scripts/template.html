@@ -85,6 +85,12 @@
     cursor: pointer; user-select: none; transition: background 0.12s, color 0.12s;
   }
   .chip:hover { border-color: var(--accent); }
+  .link-btn {
+    font-size: 0.78rem; font-weight: 600; padding: 5px 10px; border-radius: 999px;
+    background: transparent; color: var(--text-muted); border: 1px dashed var(--border);
+    cursor: pointer; user-select: none; margin-left: auto;
+  }
+  .link-btn:hover { border-color: var(--accent); color: var(--accent); }
   .chip.active { background: var(--chip-active-bg); color: var(--chip-active-fg); border-color: var(--chip-active-bg); }
 
   .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 8px; }
@@ -163,6 +169,7 @@
   <div class="filter-bar">
     <span class="flabel">Filter podľa čerstvosti advertu:</span>
     <div class="chip-row" id="freshness-chips"></div>
+    <button type="button" class="link-btn" onclick="copyShareLink(this, 'prehlad')">🔗 Kopírovať odkaz</button>
   </div>
 
   <h2 id="prehlad">Prehľad podľa krajiny</h2>
@@ -212,6 +219,7 @@
   <div class="filter-bar" id="preset-trends-scope-wrap" style="display:none">
     <span class="flabel">Krajina:</span>
     <div class="chip-row" id="preset-trends-scope-chips"></div>
+    <button type="button" class="link-btn" onclick="copyShareLink(this, 'preset-trends-heading')">🔗 Kopírovať odkaz</button>
   </div>
   <div class="chart-wrap" id="preset-trends-chart-wrap" style="display:none">
     <div class="legend" id="preset-trends-legend"></div>
@@ -231,6 +239,7 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
   <div class="filter-bar" id="migration-scope-wrap" style="display:none">
     <span class="flabel">Krajina:</span>
     <div class="chip-row" id="migration-scope-chips"></div>
+    <button type="button" class="link-btn" onclick="copyShareLink(this, 'migration-heading')">🔗 Kopírovať odkaz</button>
   </div>
   <div class="chart-wrap" id="migration-chart-wrap" style="display:none">
     <svg class="mapsvg" id="migrationsvg" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -245,6 +254,7 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
     <span style="flex-grow:1"></span>
     <label id="community-lang-label" style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.03em"></label>
     <select id="community-lang-select" class="chip" style="cursor:pointer"></select>
+    <button type="button" class="link-btn" style="margin-left:0" onclick="copyShareLink(this, 'komunity')">🔗 Kopírovať odkaz</button>
   </div>
   <p class="section-note" id="community-intro"></p>
   <div class="community-grid" id="community-grid"></div>
@@ -280,6 +290,35 @@ function copyCodeBlock(btn) {
     const original = btn.textContent;
     btn.textContent = '✅';
     setTimeout(() => { btn.textContent = original; }, 1200);
+  });
+}
+
+// Deep-link "copy share link" buttons — reads whatever filters are *currently
+// selected* at click time (country scope / freshness / community language,
+// all declared further down as `let` — safe to reference here since this
+// only ever runs later, from a user click, by which point every `let` below
+// has already been assigned) and builds the same ?country=&fresh=&lang=#hash
+// URL documented in the meta-row hint, so the user never has to type it by hand.
+function buildShareUrl(hash) {
+  const params = new URLSearchParams();
+  if (typeof activeCountryScope !== 'undefined' && activeCountryScope && activeCountryScope !== 'ALL') {
+    params.set('country', activeCountryScope);
+  }
+  if (typeof activeFilter !== 'undefined' && activeFilter && activeFilter !== 'd7') {
+    params.set('fresh', activeFilter);
+  }
+  if (typeof activeCommunityLang !== 'undefined' && activeCommunityLang && activeCommunityLang !== (typeof defaultLang !== 'undefined' ? defaultLang : 'sk')) {
+    params.set('lang', activeCommunityLang);
+  }
+  const qs = params.toString();
+  return location.origin + location.pathname + (qs ? '?' + qs : '') + (hash ? '#' + hash : '');
+}
+function copyShareLink(btn, hash) {
+  const url = buildShareUrl(hash);
+  navigator.clipboard.writeText(url).then(() => {
+    const original = btn.textContent;
+    btn.textContent = '✅ Skopírované';
+    setTimeout(() => { btn.textContent = original; }, 1500);
   });
 }
 
