@@ -110,6 +110,33 @@ prebuildí live stránku. Beží pod defaultným `GITHUB_TOKEN` (permission
 `contents: write` je nastavená v workflow súbore), netreba žiadny ďalší
 secret ani PAT.
 
+## Rýchla navigácia / deep-linky
+
+Report číta query parametre a hash z URL pri načítaní, takže sa dá poslať
+odkaz, ktorý otvorí stránku rovno s prednastaveným filtrom a naskrolovanú na
+konkrétnu sekciu:
+
+```
+index.html?country=SK&fresh=d7&lang=en#trendy
+```
+
+- `country=<KÓD>` — nastaví zdieľaný prepínač krajiny (Trendy podľa presetu +
+  Migrácia), napr. `SK`. Neplatná/chýbajúca hodnota = "Všetky".
+- `fresh=<kľúč>` — nastaví filter čerstvosti (`all`, `d3`, `d7`, `d10`, `d30`,
+  `stale`). Default `d7`.
+- `lang=<kód>` — nastaví jazyk sekcie "Komunitné a koordinačné stránky"
+  (`sk`, `en`, `de`, `hu`, `cs`, `nl`). Má prednosť pred auto-detekciou
+  prehliadača aj pred uloženou voľbou v `localStorage`.
+- `#<id>` — naskroluje na sekciu po dorenderovaní obsahu (nie na natívne
+  prehliadačové správanie, keďže mapa/grafy pridávajú výšku stránky až po
+  načítaní). Dostupné id: `prehlad`, `presety`, `mapa`, `cerstvost`,
+  `trendy`, `zistenia`, `komunity`.
+
+Implementácia: `URL_PARAMS` (parsovaný z `location.search` na začiatku
+skriptu v `template.html`) sa použije pri inicializácii `activeFilter`,
+`activeCountryScope` a `detectInitialLang()` — všetky tri už existujúce
+mechanizmy filtrovania, len s URL ako najvyššou prioritou zdroja hodnoty.
+
 ## Zdroje dát
 
 - `map.meshcore.io/api/v1/nodes` — zoznam uzlov siete (fetchované pri

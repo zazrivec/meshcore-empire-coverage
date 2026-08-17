@@ -154,6 +154,7 @@
     <div><b>Presety:</b> api.meshcore.nz/api/v1/config</div>
     <div><b>Hranice a mapový podklad:</b> OpenStreetMap / geoBoundaries.org</div>
     <div><b>Stiahnuté:</b> __BUILD_DATE__</div>
+    <div><b>Rýchla navigácia:</b> <code>?country=SK&amp;fresh=d7&amp;lang=en#trendy</code> — prednastaví filter krajiny/čerstvosti/jazyka a naskroluje na danú sekciu (ids: prehlad, presety, mapa, cerstvost, trendy, zistenia, komunity)</div>
   </div>
 
   <div class="callout" id="headline-callout"></div>
@@ -163,26 +164,26 @@
     <div class="chip-row" id="freshness-chips"></div>
   </div>
 
-  <h2>Prehľad podľa krajiny</h2>
+  <h2 id="prehlad">Prehľad podľa krajiny</h2>
   <p class="section-note" id="filter-echo"></p>
   <p class="section-note">Hustota = počet repeaterov na 1000&nbsp;km² rozlohy krajiny. Reaguje na filter čerstvosti vyššie — pri prísnejšom okne (napr. ≤3&nbsp;dni) tak vidno hustotu <i>aktuálne živej</i> siete, nie celej historickej.</p>
   <div class="stat-grid" id="stat-grid"></div>
 
-  <h2>Rozdelenie rádiových parametrov</h2>
+  <h2 id="presety">Rozdelenie rádiových parametrov</h2>
   <p class="section-note">Presety „Hungary&rdquo;, „Slovakia&rdquo; a „Netherlands&rdquo; v konfigurácii mapy majú <b>identické</b> rádio parametre (869.618&nbsp;MHz / BW&nbsp;62.5 / SF7 / CR5) — zoskupené podľa reálnych parametrov, nie mena presetu. Česko a Poľsko majú svoje vlastné výrazné kombinácie, preto majú samostatnú farbu.</p>
   <div class="chart-wrap">
     <div class="legend" id="preset-legend"></div>
     <div class="bars" id="preset-bars"></div>
   </div>
 
-  <h2>Mapa pokrytia</h2>
+  <h2 id="mapa">Mapa pokrytia</h2>
   <p class="section-note">Interaktívna mapa (OpenStreetMap podklad, zoom/pan). Farba bodky = rádio preset. Filter čerstvosti vyššie reaguje aj tu. Klikni na preset v legende nižšie a vypni/zapni ho na mape.</p>
   <div class="map-wrap">
     <div class="legend" id="map-legend"></div>
     <div id="map"></div>
   </div>
 
-  <h2>Čerstvosť advertov (last_advert)</h2>
+  <h2 id="cerstvost">Čerstvosť advertov (last_advert)</h2>
   <p class="section-note">Rozdelenie podľa času od posledného rádiového advertu zachyteného mapou.</p>
   <div class="chart-wrap">
     <table>
@@ -191,7 +192,7 @@
     </table>
   </div>
 
-  <h2>Trendy</h2>
+  <h2 id="trendy">Trendy</h2>
   <p class="section-note" id="trends-note">Počet repeaterov v čase, počítaný z vlastných denných snapshotov tohto buildu (map.meshcore.io samo o sebe históriu adverts neposkytuje — pozri poznámku nižšie). Os Y je zámerne priblížená na rozsah reálnych hodnôt, nie od nuly — pri zatiaľ krátkej histórii (pár dní) by 0-báza spôsobila, že denné zmeny (rádovo desiatky-stovky z ~16&nbsp;000 celkom) vyzerajú ako plochá čiara bez informačnej hodnoty. Presné počty sú v tooltipe aj v tabuľke nižšie.</p>
   <div class="chart-wrap" id="trends-chart-wrap" style="display:none">
     <div class="legend" id="trends-legend"></div>
@@ -235,11 +236,11 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
   </div>
   <p class="section-note" id="migration-empty" style="display:none">Migrácia medzi presetmi potrebuje aspoň 2 dni denných snapshotov (rovnako ako „Trendy podľa presetu&rdquo; vyššie) — zatiaľ je k dispozícii len jeden deň. Vráť sa po ďalšom builde.</p>
 
-  <h2>Zistenia</h2>
+  <h2 id="zistenia">Zistenia</h2>
   <div id="findings"></div>
 
   <div class="filter-bar">
-    <h2 id="community-heading" style="margin:0"></h2>
+    <h2 id="komunity" style="margin:0"></h2>
     <span style="flex-grow:1"></span>
     <label id="community-lang-label" style="font-size:0.78rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:0.03em"></label>
     <select id="community-lang-select" class="chip" style="cursor:pointer"></select>
@@ -256,6 +257,12 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
 const DATA = JSON.parse(document.getElementById('data-json').textContent);
 const points = DATA.points; // {lat, lon, name, c, m, b, ad}
 const borders = DATA.borders || {};
+
+// Deep-linking: ?country=SK&fresh=d7&lang=en#trendy pre-sets the country
+// scope (Trendy podľa presetu / Migrácia), the freshness chip, and the
+// community-section language, then scrolls to the given section on load —
+// so a link can be shared that opens straight into a specific filtered view.
+const URL_PARAMS = new URLSearchParams(location.search);
 
 // ISO 3166-1 alpha-2 -> flag emoji (regional indicator symbols). All our
 // country codes are already standard alpha-2, so no lookup table needed.
@@ -318,7 +325,8 @@ const FILTERS = [
   { key: 'd30', label: '≤ 30 dní', test: ad => ad <= 30 },
   { key: 'stale', label: '> 30 dní (stale)', test: ad => ad > 30 },
 ];
-let activeFilter = 'd7';
+const urlFresh = URL_PARAMS.get('fresh');
+let activeFilter = FILTERS.some(f => f.key === urlFresh) ? urlFresh : 'd7';
 
 document.getElementById('freshness-chips').innerHTML = FILTERS.map(f =>
   `<div class="chip${f.key===activeFilter ? ' active' : ''}" data-key="${f.key}">${f.label}</div>`
@@ -610,7 +618,8 @@ function renderTrends() {
 // country in either place switches it in both, so they always tell the same
 // story for the same scope.
 const COUNTRY_SCOPES = [{ key: 'ALL', label: 'Všetky' }, ...countryOrder.map(c => ({ key: c, label: `${flagEmoji(c)} ${c}` }))];
-let activeCountryScope = 'ALL';
+const urlCountry = (URL_PARAMS.get('country') || '').toUpperCase();
+let activeCountryScope = countryOrder.includes(urlCountry) ? urlCountry : 'ALL';
 const countryScopeListeners = [];
 function onCountryScopeChange(fn) { countryScopeListeners.push(fn); }
 function setCountryScope(key) {
@@ -904,6 +913,8 @@ const availableLangs = DATA.languages || Object.keys(communityStrings);
 const defaultLang = DATA.defaultLang || 'sk';
 
 function detectInitialLang() {
+  const urlLang = (URL_PARAMS.get('lang') || '').toLowerCase();
+  if (availableLangs.includes(urlLang)) return urlLang;
   const saved = localStorage.getItem(LANG_STORAGE_KEY);
   if (saved && availableLangs.includes(saved)) return saved;
   const browserLang = (navigator.language || '').slice(0, 2).toLowerCase();
@@ -949,6 +960,16 @@ renderPresetTrends();
 renderMigration();
 renderCommunities();
 render();
+
+// Re-apply the #hash scroll after everything above has rendered — the map,
+// charts and tables all add height to the page as they populate, which can
+// throw off the browser's own initial (pre-render) scroll-to-anchor.
+if (location.hash) {
+  const target = document.getElementById(location.hash.slice(1));
+  if (target) {
+    requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+  }
+}
 </script>
 </body>
 </html>
