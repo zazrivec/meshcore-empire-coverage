@@ -7,3 +7,5 @@
 - [om3kff.sk (tag: MeshCore)](https://om3kff.sk/tag/meshcore/?lang=sk) — blog a novinky, vrátane prechodu Bratislavy na preset 869.618MHz/SF8/BW62.5/CR8.
 
 Komunita okolo OM3KFF/OM5M (Bratislava), pravidelné stretnutia **štvrtok 17:30** v Rádioklube Omega, Staré Grunty 53, Mlynská dolina.
+
+**Príkaz pre dominantný preset v sieti** (~68.8% uzlov): `set radio 869.618,62.5,7,5`

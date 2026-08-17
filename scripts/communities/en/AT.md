@@ -4,3 +4,5 @@
 - [meshcore-austria.at](https://meshcore-austria.at/doku.php?id=start) — documentation wiki (DokuWiki).
 
 Repeaters are tagged regionally (e.g. `europe`, `at`) for targeted routing. Recommended settings: Zero-Hop Advert ~240 min, Flood-Advert 24–48h.
+
+**Command for the network's dominant preset** (~76.3% of nodes): `set radio 869.618,62.5,8,8`

@@ -13,3 +13,5 @@
 - [amaterskeradio.cz — MeshCore vs. Meshtastic](https://amaterskeradio.cz/cs/meshcore-vs-meschtastic/)
 
 Český preset (869.432MHz/BW62.5/SF7/CR5, "Czech Republic Narrow") běží na jiné frekvenci než okolní SK/HU/NL i AT/DE/SI blok — viz sekci "Rozdělení rádiových parametrů" výše.
+
+**Příkaz pro dominantní preset v síti** (~98.8% uzlů): `set radio 869.432,62.5,7,5`

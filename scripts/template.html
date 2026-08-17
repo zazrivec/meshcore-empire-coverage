@@ -187,7 +187,7 @@
   </div>
 
   <h2>Trendy</h2>
-  <p class="section-note" id="trends-note">Počet repeaterov v čase, počítaný z vlastných denných snapshotov tohto buildu (map.meshcore.io samo o sebe históriu adverts neposkytuje — pozri poznámku nižšie).</p>
+  <p class="section-note" id="trends-note">Počet repeaterov v čase, počítaný z vlastných denných snapshotov tohto buildu (map.meshcore.io samo o sebe históriu adverts neposkytuje — pozri poznámku nižšie). Os Y je zámerne priblížená na rozsah reálnych hodnôt, nie od nuly — pri zatiaľ krátkej histórii (pár dní) by 0-báza spôsobila, že denné zmeny (rádovo desiatky-stovky z ~16&nbsp;000 celkom) vyzerajú ako plochá čiara bez informačnej hodnoty. Presné počty sú v tooltipe aj v tabuľke nižšie.</p>
   <div class="chart-wrap" id="trends-chart-wrap" style="display:none">
     <div class="legend" id="trends-legend"></div>
     <svg class="mapsvg" id="trendsvg" viewBox="0 0 900 260" xmlns="http://www.w3.org/2000/svg"></svg>
@@ -501,8 +501,17 @@ function renderTrends() {
 
   const W = 900, H = 260, PAD = 30;
   const series = trends.grandTotal;
-  const max = Math.max(...series, 1);
-  const min = Math.min(...series, 0);
+  // Zoomed to the actual data range (not forced to a 0 baseline) — with only
+  // a few days of history the day-to-day change is a tiny fraction of the
+  // ~16k total, so a 0-anchored axis would render as a flat, meaningless
+  // line. This is a time-series trend, not a magnitude comparison, so a
+  // zoomed axis is the right call here (tooltips + the table below still
+  // show exact counts).
+  const rawMax = Math.max(...series);
+  const rawMin = Math.min(...series);
+  const pad = Math.max((rawMax - rawMin) * 0.15, 1);
+  const max = rawMax + pad;
+  const min = Math.max(0, rawMin - pad);
   const range = (max - min) || 1;
   const stepX = (W - 2 * PAD) / (n - 1);
   const xy = (i, v) => [PAD + i * stepX, H - PAD - (v - min) / range * (H - 2 * PAD)];
@@ -549,8 +558,14 @@ function renderTrends() {
   lastLabel.textContent = trends.dates[trends.dates.length - 1];
   svg.appendChild(lastLabel);
 
+  const grandFirst = series[0], grandLast = series[series.length - 1];
+  const grandDelta = grandLast - grandFirst;
+  const grandDeltaPct = grandFirst ? Math.round(grandDelta / grandFirst * 1000) / 10 : 0;
+  const grandColor = grandDelta > 0 ? 'var(--series-sf8)' : (grandDelta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
   document.getElementById('trends-legend').innerHTML =
-    `<span><i style="background:var(--accent)"></i>Repeaterov celkovo (17 krajín) — ${trends.dates[0]} → ${trends.dates[n - 1]}</span>`;
+    `<span><i style="background:var(--accent)"></i>Repeaterov celkovo (17 krajín): ${grandFirst} → ${grandLast}` +
+    ` <b style="color:${grandColor}">(${grandDelta > 0 ? '+' : ''}${grandDelta}, ${grandDeltaPct > 0 ? '+' : ''}${grandDeltaPct}%)</b>` +
+    ` za ${trends.dates[0]} → ${trends.dates[n - 1]}</span>`;
 
   document.getElementById('trends-table').innerHTML = countryOrder.map(c => {
     const s = trends.countryTotals[c] || [];

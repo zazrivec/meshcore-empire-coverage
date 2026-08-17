@@ -4,3 +4,5 @@
 - [meshcore-austria.at](https://meshcore-austria.at/doku.php?id=start) — Dokumentations-Wiki (DokuWiki).
 
 Repeater werden regional getaggt (z. B. `europe`, `at`) für gezieltes Routing. Empfohlene Einstellungen: Zero-Hop Advert ~240 Min., Flood-Advert 24–48 Std.
+
+**Befehl für den in diesem Netz dominanten Preset** (~76.3% der Knoten): `set radio 869.618,62.5,8,8`

@@ -10,3 +10,5 @@
 - [73sbe.wordpress.com/meshcore-belgie](https://73sbe.wordpress.com/meshcore-belgie/) — stránka zakladajúcej skupiny 73s.be.
 
 MeshCore prišiel do Belgicka koncom roka 2025 vďaka skupine rádioamatérov "73s.be" (ON3DZG Gerald, ON7KHZ Koen, ON7MHZ Pieter). Komunita preklenuje flámsky (holandský) aj valónsky (francúzsky) región cez spoločné Discord a Telegram kanály. Odporúčaný preset pre Belgicko: EU/UK (Narrow), pásmo 868MHz.
+
+**Príkaz pre dominantný preset v sieti** (~91.1% uzlov): `set radio 869.618,62.5,8,8`

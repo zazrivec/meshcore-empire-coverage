@@ -7,3 +7,5 @@
 - [om3kff.sk (tag: MeshCore)](https://om3kff.sk/tag/meshcore/?lang=sk) — blog and news, including Bratislava's switch to the 869.618MHz/SF8/BW62.5/CR8 preset.
 
 Community centred around OM3KFF/OM5M (Bratislava), with regular meetups **every Thursday at 17:30** at Rádioklub Omega, Staré Grunty 53, Mlynská dolina.
+
+**Command for the network's dominant preset** (~68.8% of nodes): `set radio 869.618,62.5,7,5`

@@ -10,3 +10,5 @@
 - [73sbe.wordpress.com/meshcore-belgie](https://73sbe.wordpress.com/meshcore-belgie/) — pagina van de oprichtende groep 73s.be.
 
 MeshCore kwam eind 2025 naar België via de radioamateurgroep "73s.be" (ON3DZG Gerald, ON7KHZ Koen, ON7MHZ Pieter). De community overbrugt zowel Vlaanderen (Nederlandstalig) als Wallonië (Franstalig) via gedeelde Discord- en Telegram-kanalen. Aanbevolen preset voor België: EU/UK (Narrow), 868MHz-band.
+
+**Commando voor de dominante preset in dit netwerk** (~91.1% van de nodes): `set radio 869.618,62.5,8,8`

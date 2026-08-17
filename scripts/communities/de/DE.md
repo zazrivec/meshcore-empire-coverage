@@ -1,5 +1,15 @@
 ## Deutschland
 
-Noch nicht erfasst. Wenn du eine lokale MeshCore-Community oder Koordinationsseite für Deutschland kennst, erstelle bitte einen PR gegen `scripts/communities/sk/DE.md` (und dessen Sprachvarianten).
+- [meshcore-de.fyi](https://meshcore-de.fyi/) — Haupt-Hub für Deutschland.
+- [talk.meshcore-de.fyi](https://talk.meshcore-de.fyi/) — Community-Forum.
+- [meshcorenetz.de](https://meshcorenetz.de/) — Netzwerk-Portal.
+- [analyzer.meshcorenetz.de](https://analyzer.meshcorenetz.de/) — Netzwerk-Analyzer.
+- [map.meshcore.dev](https://map.meshcore.dev/) — Netzwerkkarte.
+- [localmesh.de](https://www.localmesh.de/) — lokale Community.
+- [localmesh.de/karte](https://www.localmesh.de/karte/) — Abdeckungskarte.
+- [mesh-sn.de](https://mesh-sn.de/) — regionale Community (Sächsische Schweiz und Umgebung).
+- [msh3.de — MeshCore Community](https://msh3.de/wordpress/meshcore-community/)
+- [t.me/meshcorede](https://t.me/meshcorede) — Telegram-Gruppe.
+- [meshcore.ninja — MeshCore DE](https://meshcore.ninja/network/meshcore-de/) — Netzwerküberblick.
 
-Versuch alternativ den europaweiten Knotenpunkt: [meshcoreeurope.org/community](https://meshcoreeurope.org/en/community/).
+**Befehl für den in diesem Netz dominanten Preset** (~82.4% der Knoten): `set radio 869.618,62.5,8,8`
