@@ -11,4 +11,8 @@
 
 Poľská sieť má okrem dominantného SF8/CR8 (v súlade s DE/AT/CH blokom) aj výrazný vedľajší SF6/CR8 zhluk bez oficiálneho mena — pozri sekciu "Rozdelenie rádiových parametrov" vyššie.
 
-**Príkaz pre dominantný preset v sieti** (~79.1% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~79.1% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```

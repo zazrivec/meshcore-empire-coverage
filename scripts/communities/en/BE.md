@@ -11,4 +11,8 @@
 
 MeshCore arrived in Belgium in late 2025 through the amateur radio group "73s.be" (ON3DZG Gerald, ON7KHZ Koen, ON7MHZ Pieter). The community bridges both the Flemish (Dutch-speaking) and Walloon (French-speaking) regions via shared Discord and Telegram channels. Recommended preset for Belgium: EU/UK (Narrow), 868MHz band.
 
-**Command for the network's dominant preset** (~91.1% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~91.1% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

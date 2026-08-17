@@ -105,6 +105,11 @@
   .community-card ul { margin: 0 0 8px; padding-left: 18px; }
   .community-card li { margin-bottom: 4px; }
   .community-card a { color: var(--accent); }
+  .code-block-wrap { position: relative; margin: 0 0 8px; }
+  .code-block-wrap pre { margin: 0; background: var(--surface-2); border: 1px solid var(--border); border-radius: 6px; padding: 10px 40px 10px 12px; overflow-x: auto; }
+  .code-block-wrap code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 0.8rem; color: var(--text-primary); white-space: pre; }
+  .code-block-wrap .copy-btn { position: absolute; top: 6px; right: 6px; background: var(--surface-1); border: 1px solid var(--border); border-radius: 4px; font-size: 0.85rem; line-height: 1; padding: 4px 6px; cursor: pointer; color: var(--text-secondary); }
+  .code-block-wrap .copy-btn:hover { border-color: var(--accent); }
   .spark-delta { font-size: 0.72rem; font-variant-numeric: tabular-nums; }
 
   .chart-wrap { background: var(--surface-1); border: 1px solid var(--border); border-radius: 10px; padding: 20px 22px 16px; margin-bottom: 20px; overflow-x: auto; }
@@ -120,7 +125,7 @@
   .legend.clickable span.off i { background: var(--text-muted) !important; }
 
   .bars { display: flex; flex-direction: column; gap: 12px; min-width: 480px; }
-  .bar-row { display: grid; grid-template-columns: 40px 1fr 52px; align-items: center; gap: 10px; font-size: 0.82rem; }
+  .bar-row { display: grid; grid-template-columns: 62px 1fr 52px; align-items: center; gap: 10px; font-size: 0.82rem; }
   .bar-row .label { color: var(--text-secondary); font-weight: 600; }
   .bar-track { display: flex; height: 18px; border-radius: 4px; overflow: hidden; background: var(--surface-2); }
   .bar-seg { height: 100%; }
@@ -251,6 +256,24 @@ Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — ro
 const DATA = JSON.parse(document.getElementById('data-json').textContent);
 const points = DATA.points; // {lat, lon, name, c, m, b, ad}
 const borders = DATA.borders || {};
+
+// ISO 3166-1 alpha-2 -> flag emoji (regional indicator symbols). All our
+// country codes are already standard alpha-2, so no lookup table needed.
+function flagEmoji(code) {
+  return [...code.toUpperCase()].map(ch => String.fromCodePoint(127397 + ch.charCodeAt(0))).join('');
+}
+
+// Copy-to-clipboard for fenced code blocks rendered by render_markdown() in
+// build.py (community pages' "set radio ..." commands).
+function copyCodeBlock(btn) {
+  const code = btn.parentElement.querySelector('code');
+  if (!code) return;
+  navigator.clipboard.writeText(code.textContent).then(() => {
+    const original = btn.textContent;
+    btn.textContent = '✅';
+    setTimeout(() => { btn.textContent = original; }, 1200);
+  });
+}
 
 const countryOrder = ['SK','AT','HU','CZ','DE','SI','PL','IT','CH','BE','NL','LU','UA','DK','HR','RO','GR'];
 const countryLabel = { SK:'Slovensko', AT:'Rakúsko', HU:'Maďarsko', CZ:'Česko', DE:'Nemecko', SI:'Slovinsko', PL:'Poľsko', IT:'Taliansko', CH:'Švajčiarsko', BE:'Belgicko', NL:'Holandsko', LU:'Luxembursko', UA:'Ukrajina', DK:'Dánsko', HR:'Chorvátsko', RO:'Rumunsko', GR:'Grécko' };
@@ -389,7 +412,7 @@ function render() {
     const d = dominant(s);
     const spark = sparklineFor(c);
     return `<div class="stat-tile">
-      <div class="country">${countryLabel[c]} (${c})</div>
+      <div class="country">${flagEmoji(c)} ${countryLabel[c]} (${c})</div>
       <div class="count">${s.total}</div>
       <div class="dom">dominantný preset: <b>${d.name}</b> ${s.total ? `(${d.pct}%)` : ''}</div>
       <div class="density">hustota: <b>${densityByCountry[c].toFixed(2)}</b> rpt / 1000&nbsp;km²</div>
@@ -404,7 +427,7 @@ function render() {
       const pct = 100*n/s.total;
       return pct > 0 ? `<div class="bar-seg" style="width:${pct}%;background:${b.color}" title="${b.label}: ${n} (${pct.toFixed(1)}%)"></div>` : '';
     }).join('');
-    return `<div class="bar-row"><div class="label">${c}</div><div class="bar-track">${track}</div><div class="n">${s.total}</div></div>`;
+    return `<div class="bar-row"><div class="label">${flagEmoji(c)} ${c}</div><div class="bar-track">${track}</div><div class="n">${s.total}</div></div>`;
   }).join('');
 
   renderMarkers(activeFilter);
@@ -427,7 +450,7 @@ document.getElementById('fresh-table').innerHTML = countryOrder.map(c => {
   const n30 = pts.filter(p => p.ad <= 30).length;
   const nStale = pts.filter(p => p.ad > 30).length;
   return `<tr>
-    <td>${countryLabel[c]} (${c})</td>
+    <td>${flagEmoji(c)} ${countryLabel[c]} (${c})</td>
     <td class="num">${n3}</td><td class="num">${n7}</td><td class="num">${n10}</td><td class="num">${n30}</td>
     <td class="num" style="color:var(--status-stale)">${nStale}</td><td class="num">${pts.length}</td>
   </tr>`;
@@ -574,7 +597,7 @@ function renderTrends() {
     const deltaPct = first ? Math.round(delta / first * 1000) / 10 : 0;
     const color = delta > 0 ? 'var(--series-sf8)' : (delta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
     return `<tr>
-      <td>${countryLabel[c]} (${c})</td>
+      <td>${flagEmoji(c)} ${countryLabel[c]} (${c})</td>
       <td class="num">${first}</td>
       <td class="num">${last}</td>
       <td class="num" style="color:${color}">${delta > 0 ? '+' : ''}${delta}</td>
@@ -586,7 +609,7 @@ function renderTrends() {
 // Shared across both "Trendy podľa presetu" and "Migrácia" — switching the
 // country in either place switches it in both, so they always tell the same
 // story for the same scope.
-const COUNTRY_SCOPES = [{ key: 'ALL', label: 'Všetky' }, ...countryOrder.map(c => ({ key: c, label: c }))];
+const COUNTRY_SCOPES = [{ key: 'ALL', label: 'Všetky' }, ...countryOrder.map(c => ({ key: c, label: `${flagEmoji(c)} ${c}` }))];
 let activeCountryScope = 'ALL';
 const countryScopeListeners = [];
 function onCountryScopeChange(fn) { countryScopeListeners.push(fn); }
@@ -917,7 +940,7 @@ function renderCommunities() {
     const html = pages[c];
     if (!html) return '';
     const name = names[c] || c;
-    return `<div class="community-card"><div class="community-card-header">${name} (${c})</div>${html}</div>`;
+    return `<div class="community-card"><div class="community-card-header">${flagEmoji(c)} ${name} (${c})</div>${html}</div>`;
   }).join('');
 }
 

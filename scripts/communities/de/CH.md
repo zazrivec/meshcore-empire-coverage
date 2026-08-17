@@ -12,4 +12,8 @@
 - [map.meshcore.dev](https://map.meshcore.dev/) — offizielle globale Karte.
 - [Facebook-Gruppe](https://www.facebook.com/groups/9587060018050008)
 
-**Befehl für den in diesem Netz dominanten Preset** (~86.4% der Knoten): `set radio 869.618,62.5,8,8`
+**Befehl für den in diesem Netz dominanten Preset** (~86.4% der Knoten):
+
+```
+set radio 869.618,62.5,8,8
+```

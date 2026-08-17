@@ -11,4 +11,8 @@
 
 Besides the dominant SF8/CR8 (aligned with the DE/AT/CH block), the Polish network also has a notable secondary SF6/CR8 cluster with no official preset name — see the "Radio parameter breakdown" section above.
 
-**Command for the network's dominant preset** (~79.1% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~79.1% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

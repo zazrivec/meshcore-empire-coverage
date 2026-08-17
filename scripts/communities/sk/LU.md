@@ -10,4 +10,8 @@
 - [lemcit.lu](https://www.lemcit.lu/)
 - [beprepared.lu](https://www.beprepared.lu/) — príprava na núdzové situácie, relevantné pre využitie MeshCore ako záložnej komunikácie.
 
-**Príkaz pre dominantný preset v sieti** (~94.8% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~94.8% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```

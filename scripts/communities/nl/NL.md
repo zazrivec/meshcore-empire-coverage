@@ -10,4 +10,8 @@
 
 Regionale structuur op basis van provincies (Noord-Holland, Zuid-Holland, Utrecht, Gelderland, Brabant...) — een repeater krijgt de tags `nl` + `nl-<provincie>` (bijv. `nl-dr` voor Drenthe). Coördinatie verloopt via de Telegram-groep.
 
-**Commando voor de dominante preset in dit netwerk** (~66.3% van de nodes): `set radio 869.618,62.5,7,5`
+**Commando voor de dominante preset in dit netwerk** (~66.3% van de nodes):
+
+```
+set radio 869.618,62.5,7,5
+```

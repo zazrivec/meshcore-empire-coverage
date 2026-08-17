@@ -12,4 +12,8 @@
 - [map.meshcore.dev](https://map.meshcore.dev/) — oficiálna globálna mapa.
 - [Facebook skupina](https://www.facebook.com/groups/9587060018050008)
 
-**Príkaz pre dominantný preset v sieti** (~86.4% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~86.4% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```

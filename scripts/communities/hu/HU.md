@@ -6,4 +6,8 @@
 
 A magyar hálózat Szlovákia és Ausztria felé is bővül.
 
-**Parancs a hálózatban domináns preset beállításához** (~52.9% csomópont): `set radio 869.618,62.5,7,5`
+**Parancs a hálózatban domináns preset beállításához** (~52.9% csomópont):
+
+```
+set radio 869.618,62.5,7,5
+```

@@ -13,4 +13,8 @@
 
 Part of the Italian network runs on the 433MHz band instead of the usual 868/869MHz — see the "Radio parameter breakdown" section above.
 
-**Command for the network's dominant preset** (~84.0% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~84.0% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

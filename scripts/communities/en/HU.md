@@ -6,4 +6,8 @@
 
 The Hungarian network also extends into Slovakia and Austria.
 
-**Command for the network's dominant preset** (~52.9% of nodes): `set radio 869.618,62.5,7,5`
+**Command for the network's dominant preset** (~52.9% of nodes):
+
+```
+set radio 869.618,62.5,7,5
+```

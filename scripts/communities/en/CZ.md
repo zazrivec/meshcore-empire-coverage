@@ -14,4 +14,8 @@
 
 The Czech preset (869.432MHz/BW62.5/SF7/CR5, "Czech Republic Narrow") runs on a different frequency than the surrounding SK/HU/NL and AT/DE/SI blocks — see the "Radio parameter breakdown" section above.
 
-**Command for the network's dominant preset** (~98.8% of nodes): `set radio 869.432,62.5,7,5`
+**Command for the network's dominant preset** (~98.8% of nodes):
+
+```
+set radio 869.432,62.5,7,5
+```

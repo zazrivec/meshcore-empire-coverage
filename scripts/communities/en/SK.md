@@ -8,4 +8,8 @@
 
 Community centred around OM3KFF/OM5M (Bratislava), with regular meetups **every Thursday at 17:30** at Rádioklub Omega, Staré Grunty 53, Mlynská dolina.
 
-**Command for the network's dominant preset** (~68.8% of nodes): `set radio 869.618,62.5,7,5`
+**Command for the network's dominant preset** (~68.8% of nodes):
+
+```
+set radio 869.618,62.5,7,5
+```

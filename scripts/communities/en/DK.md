@@ -12,4 +12,8 @@
 - [Discord](https://discord.gg/ceu3nmcUBK) — community Discord server.
 - [MeshCore Quick Start Guide (Danish, PDF)](https://www.meshhub.dk/wp-content/uploads/2026/07/MeshCore_Quick_Start_Guide-App-Dansk.pdf)
 
-**Command for the network's dominant preset** (~95.0% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~95.0% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

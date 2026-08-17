@@ -12,4 +12,8 @@
 - [t.me/meshcorede](https://t.me/meshcorede) — Telegram skupina.
 - [meshcore.ninja — MeshCore DE](https://meshcore.ninja/network/meshcore-de/) — prehľad siete.
 
-**Príkaz pre dominantný preset v sieti** (~82.4% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~82.4% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```

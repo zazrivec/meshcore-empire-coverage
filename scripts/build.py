@@ -409,9 +409,11 @@ def build_migration(trends):
 
 def render_markdown(md_text):
     """Deliberately tiny markdown -> HTML converter: headings (#/##/###),
-    unordered lists (- item), **bold**, [text](url) links, and paragraphs.
-    NOT a full CommonMark implementation — just enough for the hand-authored
-    community pages in scripts/communities/. No nested lists."""
+    unordered lists (- item), **bold**, [text](url) links, ```fenced code
+    blocks``` (rendered with a copy-to-clipboard button — see copyCodeBlock()
+    in template.html), and paragraphs. NOT a full CommonMark implementation —
+    just enough for the hand-authored community pages in
+    scripts/communities/. No nested lists."""
 
     def esc(s):
         return s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
@@ -424,6 +426,8 @@ def render_markdown(md_text):
 
     html_parts = []
     in_list = False
+    in_code = False
+    code_lines = []
     paragraph_buf = []
 
     def flush_paragraph():
@@ -437,8 +441,30 @@ def render_markdown(md_text):
             html_parts.append("</ul>")
             in_list = False
 
-    for raw_line in md_text.strip("\n").split("\n"):
+    lines = md_text.strip("\n").split("\n")
+    for raw_line in lines:
         line = raw_line.strip()
+
+        if in_code:
+            if line.startswith("```"):
+                code_text = esc("\n".join(code_lines))
+                html_parts.append(
+                    '<div class="code-block-wrap">'
+                    '<button type="button" class="copy-btn" onclick="copyCodeBlock(this)" title="Copy" aria-label="Copy">📋</button>'
+                    f'<pre><code>{code_text}</code></pre></div>'
+                )
+                code_lines = []
+                in_code = False
+            else:
+                code_lines.append(raw_line)
+            continue
+
+        if line.startswith("```"):
+            flush_paragraph()
+            close_list()
+            in_code = True
+            continue
+
         if not line:
             flush_paragraph()
             close_list()
@@ -460,6 +486,15 @@ def render_markdown(md_text):
             close_list()
             paragraph_buf.append(inline(line))
 
+    # Unterminated fence (shouldn't happen in well-formed content) — flush
+    # whatever we collected rather than silently dropping it.
+    if in_code and code_lines:
+        code_text = esc("\n".join(code_lines))
+        html_parts.append(
+            '<div class="code-block-wrap">'
+            '<button type="button" class="copy-btn" onclick="copyCodeBlock(this)" title="Copy" aria-label="Copy">📋</button>'
+            f'<pre><code>{code_text}</code></pre></div>'
+        )
     flush_paragraph()
     close_list()
     return "\n".join(html_parts)

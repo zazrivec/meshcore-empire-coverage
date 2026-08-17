@@ -12,4 +12,8 @@
 - [t.me/meshcorede](https://t.me/meshcorede) — Telegram-Gruppe.
 - [meshcore.ninja — MeshCore DE](https://meshcore.ninja/network/meshcore-de/) — Netzwerküberblick.
 
-**Befehl für den in diesem Netz dominanten Preset** (~82.4% der Knoten): `set radio 869.618,62.5,8,8`
+**Befehl für den in diesem Netz dominanten Preset** (~82.4% der Knoten):
+
+```
+set radio 869.618,62.5,8,8
+```

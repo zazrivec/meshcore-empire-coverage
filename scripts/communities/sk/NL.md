@@ -10,4 +10,8 @@
 
 Regionálna štruktúra podľa provincií (Noord-Holland, Zuid-Holland, Utrecht, Gelderland, Brabant...) — repeater dostáva tagy `nl` + `nl-<provincia>` (napr. `nl-dr` pre Drenthe). Koordinácia prebieha cez Telegram skupinu.
 
-**Príkaz pre dominantný preset v sieti** (~66.3% uzlov): `set radio 869.618,62.5,7,5`
+**Príkaz pre dominantný preset v sieti** (~66.3% uzlov):
+
+```
+set radio 869.618,62.5,7,5
+```

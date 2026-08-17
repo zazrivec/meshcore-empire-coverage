@@ -13,4 +13,8 @@
 
 Časť talianskej siete beží na 433MHz pásme namiesto bežných 868/869MHz — pozri sekciu "Rozdelenie rádiových parametrov" vyššie.
 
-**Príkaz pre dominantný preset v sieti** (~84.0% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~84.0% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```

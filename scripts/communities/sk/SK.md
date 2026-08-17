@@ -8,4 +8,8 @@
 
 Komunita okolo OM3KFF/OM5M (Bratislava), pravidelné stretnutia **štvrtok 17:30** v Rádioklube Omega, Staré Grunty 53, Mlynská dolina.
 
-**Príkaz pre dominantný preset v sieti** (~68.8% uzlov): `set radio 869.618,62.5,7,5`
+**Príkaz pre dominantný preset v sieti** (~68.8% uzlov):
+
+```
+set radio 869.618,62.5,7,5
+```

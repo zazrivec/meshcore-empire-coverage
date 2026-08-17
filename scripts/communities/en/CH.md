@@ -12,4 +12,8 @@
 - [map.meshcore.dev](https://map.meshcore.dev/) — official global map.
 - [Facebook group](https://www.facebook.com/groups/9587060018050008)
 
-**Command for the network's dominant preset** (~86.4% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~86.4% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

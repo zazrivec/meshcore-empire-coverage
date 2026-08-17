@@ -10,4 +10,8 @@
 - [lemcit.lu](https://www.lemcit.lu/)
 - [beprepared.lu](https://www.beprepared.lu/) — emergency preparedness, relevant for using MeshCore as backup communication.
 
-**Command for the network's dominant preset** (~94.8% of nodes): `set radio 869.618,62.5,8,8`
+**Command for the network's dominant preset** (~94.8% of nodes):
+
+```
+set radio 869.618,62.5,8,8
+```

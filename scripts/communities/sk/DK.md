@@ -12,4 +12,8 @@
 - [Discord](https://discord.gg/ceu3nmcUBK) — komunitný Discord server.
 - [MeshCore Quick Start Guide (dánsky, PDF)](https://www.meshhub.dk/wp-content/uploads/2026/07/MeshCore_Quick_Start_Guide-App-Dansk.pdf)
 
-**Príkaz pre dominantný preset v sieti** (~95.0% uzlov): `set radio 869.618,62.5,8,8`
+**Príkaz pre dominantný preset v sieti** (~95.0% uzlov):
+
+```
+set radio 869.618,62.5,8,8
+```
