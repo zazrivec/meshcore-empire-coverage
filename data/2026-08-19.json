@@ -1,0 +1,245 @@
+{
+  "by_country": {
+    "AT": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 1,
+        "other": 32,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 13,
+        "sf7cr8": 0,
+        "sf8cr5": 110,
+        "sf8cr8": 431
+      },
+      "total": 587
+    },
+    "BE": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 5,
+        "eu_dep": 1,
+        "other": 6,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 2,
+        "sf7cr8": 0,
+        "sf8cr5": 33,
+        "sf8cr8": 566
+      },
+      "total": 613
+    },
+    "CH": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 1,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 115,
+        "sf8cr8": 657
+      },
+      "total": 773
+    },
+    "CZ": {
+      "buckets": {
+        "cz_narrow": 808,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 6,
+        "pl_sf6cr8": 1,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 0,
+        "sf8cr8": 3
+      },
+      "total": 818
+    },
+    "DE": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 12,
+        "eu_dep": 20,
+        "other": 13,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 8,
+        "sf7cr8": 0,
+        "sf8cr5": 1037,
+        "sf8cr8": 5249
+      },
+      "total": 6339
+    },
+    "DK": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 1,
+        "other": 1,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 20,
+        "sf8cr8": 575
+      },
+      "total": 597
+    },
+    "GR": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 6,
+        "other": 1,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 10,
+        "sf8cr8": 35
+      },
+      "total": 52
+    },
+    "HR": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 0,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 2,
+        "sf8cr8": 21
+      },
+      "total": 23
+    },
+    "HU": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 1,
+        "eu_dep": 0,
+        "other": 1,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 92,
+        "sf7cr8": 2,
+        "sf8cr5": 24,
+        "sf8cr8": 44
+      },
+      "total": 164
+    },
+    "IT": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 94,
+        "eu_dep": 4,
+        "other": 5,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 38,
+        "sf8cr8": 603
+      },
+      "total": 744
+    },
+    "LU": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 0,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 2,
+        "sf8cr8": 76
+      },
+      "total": 78
+    },
+    "NL": {
+      "buckets": {
+        "cz_narrow": 2,
+        "eu433": 7,
+        "eu_dep": 11,
+        "other": 8,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 1623,
+        "sf7cr8": 185,
+        "sf8cr5": 34,
+        "sf8cr8": 593
+      },
+      "total": 2463
+    },
+    "PL": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 3,
+        "eu_dep": 6,
+        "other": 25,
+        "pl_sf6cr8": 279,
+        "sf7cr5": 8,
+        "sf7cr8": 1,
+        "sf8cr5": 255,
+        "sf8cr8": 2101
+      },
+      "total": 2678
+    },
+    "RO": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 2,
+        "eu_dep": 2,
+        "other": 0,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 8,
+        "sf8cr8": 160
+      },
+      "total": 172
+    },
+    "SI": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 0,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 8,
+        "sf8cr8": 66
+      },
+      "total": 74
+    },
+    "SK": {
+      "buckets": {
+        "cz_narrow": 8,
+        "eu433": 0,
+        "eu_dep": 0,
+        "other": 0,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 235,
+        "sf7cr8": 8,
+        "sf8cr5": 27,
+        "sf8cr8": 43
+      },
+      "total": 321
+    },
+    "UA": {
+      "buckets": {
+        "cz_narrow": 0,
+        "eu433": 18,
+        "eu_dep": 1,
+        "other": 8,
+        "pl_sf6cr8": 0,
+        "sf7cr5": 0,
+        "sf7cr8": 0,
+        "sf8cr5": 0,
+        "sf8cr8": 6
+      },
+      "total": 33
+    }
+  },
+  "date": "2026-08-19",
+  "generated_at": "2026-08-19T04:49:25.407076+00:00",
+  "total_repeaters": 16529
+}
