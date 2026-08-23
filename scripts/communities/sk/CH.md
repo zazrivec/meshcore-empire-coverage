@@ -14,7 +14,7 @@
 
 **Oficiálny preset komunity:** „Narrow" (=EU/UK Narrow) `869.618/62.5/SF8/CR8` — [meshcore.ch/settings](https://www.meshcore.ch/settings/), viazané na švajčiarske BAKOM pravidlo 10% duty-cycle. Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~86.4% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

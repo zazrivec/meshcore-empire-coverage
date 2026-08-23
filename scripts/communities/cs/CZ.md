@@ -14,9 +14,9 @@
 
 Český preset (869.432MHz/BW62.5/SF7/CR5, "Czech Republic Narrow") běží na jiné frekvenci než okolní SK/HU/NL i AT/DE/SI blok — viz sekci "Rozdělení rádiových parametrů" výše.
 
-**Oficiální preset komunity:** `869.432/62.5/SF7/CR5` — [meshcore.cz](https://meshcore.cz/) uvádí tuto frekvenci jako záměrnou odchylku od standardu, aby síť získala vlastní 10% duty-cycle limit v ČR nezávislý na zbytku EU/UK bloku. Shoda s daty mapy: ✅ ano (98.8 %).
+**Oficiální preset komunity:** `869.432/62.5/SF7/CR5` — [meshcore.cz](https://meshcore.cz/) uvádí tuto frekvenci jako záměrnou odchylku od standardu, aby síť získala vlastní 10% duty-cycle limit v ČR nezávislý na zbytku EU/UK bloku. Shoda s daty mapy: ✅ ano ({{PCT}}%).
 
-**Příkaz pro dominantní preset v síti** (~98.8% uzlů):
+**Příkaz pro dominantní preset v síti** (~{{PCT}}% uzlů):
 
 ```
 set radio 869.432,62.5,7,5

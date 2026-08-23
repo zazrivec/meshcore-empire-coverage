@@ -7,7 +7,7 @@ Repeatery sa taggujú regionálne (napr. `europe`, `at`) pre cielené smerovanie
 
 **Oficiálny preset komunity:** „EU/UK Narrow" `869.618/62.5/SF8/CR8` — podľa [meshcore.at](https://meshcore.at/en/) ho používajú všetky AT aj širšie DACH uzly. Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~76.3% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

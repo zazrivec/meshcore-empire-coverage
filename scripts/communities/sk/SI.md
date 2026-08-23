@@ -13,7 +13,7 @@
 
 **Oficiálny preset komunity:** „Europe/UK Narrow" `869.618/62.5/SF8/CR8` — [meshcore.si/nastavitve](https://www.meshcore.si/nastavitve.php), najdetailnejší nájdený zdroj (uvádza aj duty-cycle/EIRP/airtime faktor). Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~90.5% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

@@ -8,9 +8,9 @@
 
 Komunita okolo OM3KFF/OM5M (Bratislava), pravidelné stretnutia **štvrtok 17:30** v Rádioklube Omega, Staré Grunty 53, Mlynská dolina.
 
-**Oficiálny preset komunity:** „Slovakia" preset `869.618/62.5/SF7/CR5` — [mesh.om3kff.sk](https://mesh.om3kff.sk) explicitne oznámil migráciu celej siete na tento preset 8.8.2026 (staršie nastavenie už nie je kompatibilné). Zhoda s dátami mapy: ✅ áno (68.8 % — zvyšok sú zatiaľ nezreštartované/nemigrované uzly, nie nezhoda v odporúčaní).
+**Oficiálny preset komunity:** „Slovakia" preset `869.618/62.5/SF7/CR5` — [mesh.om3kff.sk](https://mesh.om3kff.sk) explicitne oznámil migráciu celej siete na tento preset 8.8.2026 (staršie nastavenie už nie je kompatibilné). Zhoda s dátami mapy: ✅ áno ({{PCT}}% — zvyšok sú zatiaľ nezreštartované/nemigrované uzly, nie nezhoda v odporúčaní).
 
-**Príkaz pre dominantný preset v sieti** (~68.8% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,7,5

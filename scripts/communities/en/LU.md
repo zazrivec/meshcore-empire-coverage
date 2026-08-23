@@ -12,7 +12,7 @@
 
 **Community-official preset:** the "EU/UK Narrow" preset — [meshcore.lu](https://www.meshcore.lu/). Match with map data: ✅ yes.
 
-**Command for the network's dominant preset** (~94.8% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8

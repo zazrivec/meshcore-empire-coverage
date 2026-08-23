@@ -6,9 +6,9 @@
 
 The Hungarian network also extends into Slovakia and Austria.
 
-**Community-official preset:** the "Hungary" preset — [meshcore.hu](https://mc868.hu/) confirms the switch to SF7 (migration on 2026-08-08); the remaining parameters (869.618/62.5/CR5) follow from the preset's name. Match with map data: ✅ yes (52.9% — same reason as SK, migration still in progress).
+**Community-official preset:** the "Hungary" preset — [meshcore.hu](https://mc868.hu/) confirms the switch to SF7 (migration on 2026-08-08); the remaining parameters (869.618/62.5/CR5) follow from the preset's name. Match with map data: ✅ yes ({{PCT}}% — same reason as SK, migration still in progress).
 
-**Command for the network's dominant preset** (~52.9% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,7,5

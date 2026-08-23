@@ -13,7 +13,7 @@
 
 **Oficiálny preset komunity:** „Standard for DK" `869.618/62.5/SF8/CR8` + `set dutycycle 10` — [meshhub.dk/radio-settings](https://www.meshhub.dk/radio-settings/). Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~95.0% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

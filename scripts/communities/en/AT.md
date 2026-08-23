@@ -7,7 +7,7 @@ Repeaters are tagged regionally (e.g. `europe`, `at`) for targeted routing. Reco
 
 **Community-official preset:** "EU/UK Narrow" `869.618/62.5/SF8/CR8` — per [meshcore.at](https://meshcore.at/en/), used by all AT and the wider DACH nodes. Match with map data: ✅ yes.
 
-**Command for the network's dominant preset** (~76.3% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8

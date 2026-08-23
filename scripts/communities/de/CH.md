@@ -14,7 +14,7 @@
 
 **Offizieller Community-Preset:** "Narrow" (= EU/UK Narrow) `869.618/62.5/SF8/CR8` — [meshcore.ch/settings](https://www.meshcore.ch/settings/), gekoppelt an die Schweizer BAKOM-Regel von 10% Duty-Cycle. Übereinstimmung mit den Kartendaten: ✅ ja.
 
-**Befehl für den in diesem Netz dominanten Preset** (~86.4% der Knoten):
+**Befehl für den in diesem Netz dominanten Preset** (~{{PCT}}% der Knoten):
 
 ```
 set radio 869.618,62.5,8,8

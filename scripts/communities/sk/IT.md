@@ -21,7 +21,7 @@ Podľa aktuálneho [NEXUS Italia](https://nexus.meshcoreitalia.it/) zoznamu gate
 
 Ďalšie zdroje: [Community Meshtastic Sicilia @ 433MHz (forum.loraitalia.it)](https://forum.loraitalia.it/d/19-community-meshtastic-sicilia-at-433mhz) · [MeshCore Italia — právny rámec 433MHz](https://www.meshcoreitalia.it/quadro-normativo-frequenza-433-mhz/) · [MeshCore GitHub issue #125 — žiadosť o 433MHz preset](https://github.com/meshcore-dev/MeshCore/issues/125)
 
-**Príkaz pre dominantný preset v sieti** (~84.0% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

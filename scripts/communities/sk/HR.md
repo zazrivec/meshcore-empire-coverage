@@ -2,7 +2,7 @@
 
 Zatiaľ nezmapované. Ak vieš o miestnej MeshCore komunite/koordinačnej stránke pre Chorvátsko, priprav PR do `scripts/communities/HR.md`.
 
-**Príkaz pre dominantný preset v sieti** (~91.3% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

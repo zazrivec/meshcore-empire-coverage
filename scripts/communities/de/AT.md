@@ -7,7 +7,7 @@ Repeater werden regional getaggt (z. B. `europe`, `at`) für gezieltes Routing. 
 
 **Offizieller Community-Preset:** "EU/UK Narrow" `869.618/62.5/SF8/CR8` — laut [meshcore.at](https://meshcore.at/en/) von allen AT- und weiteren DACH-Knoten verwendet. Übereinstimmung mit den Kartendaten: ✅ ja.
 
-**Befehl für den in diesem Netz dominanten Preset** (~76.3% der Knoten):
+**Befehl für den in diesem Netz dominanten Preset** (~{{PCT}}% der Knoten):
 
 ```
 set radio 869.618,62.5,8,8

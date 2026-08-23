@@ -21,7 +21,7 @@ Per the current [NEXUS Italia](https://nexus.meshcoreitalia.it/) gateway list, S
 
 Further sources: [Community Meshtastic Sicilia @ 433MHz (forum.loraitalia.it)](https://forum.loraitalia.it/d/19-community-meshtastic-sicilia-at-433mhz) · [MeshCore Italia — 433MHz regulatory framework](https://www.meshcoreitalia.it/quadro-normativo-frequenza-433-mhz/) · [MeshCore GitHub issue #125 — Italian amateur radio 433MHz preset request](https://github.com/meshcore-dev/MeshCore/issues/125)
 
-**Command for the network's dominant preset** (~84.0% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8

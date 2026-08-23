@@ -14,7 +14,7 @@
 
 **Community-official preset:** "EU/UK (Narrow)" `869.618/62.5/SF8/CR8` — [meshcore-de.fyi](https://meshcore-de.fyi/meshcore:allgemeines:empfohlene-konfiguration) recommends it directly via `set radio 869.618,62.5,8,8`. Match with map data: ✅ yes.
 
-**Command for the network's dominant preset** (~82.4% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8

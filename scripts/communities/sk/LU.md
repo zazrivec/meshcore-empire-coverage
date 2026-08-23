@@ -12,7 +12,7 @@
 
 **Oficiálny preset komunity:** „EU/UK Narrow" preset — [meshcore.lu](https://www.meshcore.lu/). Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~94.8% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

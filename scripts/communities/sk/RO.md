@@ -8,7 +8,7 @@
 
 **Oficiálny preset komunity:** „EU/UK Narrow, Switzerland" `869.618/62.5/SF8/CR8` — [meshcore.com.ro](https://meshcore.com.ro/), viazané na rumunský povolený rozsah 869.40–869.65MHz. Zhoda s dátami mapy: ✅ áno.
 
-**Príkaz pre dominantný preset v sieti** (~90.8% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

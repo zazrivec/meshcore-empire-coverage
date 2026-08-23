@@ -13,7 +13,7 @@ MeshCore prišiel do Belgicka koncom roka 2025 vďaka skupine rádioamatérov "7
 
 **Oficiálny preset komunity:** „EU/UK (Narrow)" — [loramesh.be](https://www.loramesh.be/meshcore-repeater-instellingen/) opakovane píše „vždy používaj EU/UK (Narrow)", presné čísla priamo neuvedené. Zhoda s dátami mapy: ✅ áno podľa mena.
 
-**Príkaz pre dominantný preset v sieti** (~91.1% uzlov):
+**Príkaz pre dominantný preset v sieti** (~{{PCT}}% uzlov):
 
 ```
 set radio 869.618,62.5,8,8

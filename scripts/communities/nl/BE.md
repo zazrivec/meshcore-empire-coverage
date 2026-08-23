@@ -13,7 +13,7 @@ MeshCore kwam eind 2025 naar België via de radioamateurgroep "73s.be" (ON3DZG G
 
 **Community-officiële preset:** "EU/UK (Narrow)" — [loramesh.be](https://www.loramesh.be/meshcore-repeater-instellingen/) herhaalt steeds "gebruik altijd EU/UK (Narrow)"; exacte getallen niet direct vermeld. Overeenkomst met kaartdata: ✅ ja, op naam.
 
-**Commando voor de dominante preset in dit netwerk** (~91.1% van de nodes):
+**Commando voor de dominante preset in dit netwerk** (~{{PCT}}% van de nodes):
 
 ```
 set radio 869.618,62.5,8,8

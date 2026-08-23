@@ -528,7 +528,28 @@ COUNTRY_NAMES = {
 }
 
 
-def load_community_bundles():
+def live_preset_pct(md_text, country, points):
+    """Community pages quote a "{{PCT}}% of nodes run this preset" figure.
+    Rather than hand-typing a number that goes stale the moment the live
+    network shifts, pages contain a `{{PCT}}` placeholder next to the
+    `set radio F,BW,SF,CR` command they document; this recomputes the
+    match live from the same ≤7-day-fresh points used everywhere else on
+    the page (see FILTERS/computeStats('d7') in template.html), so the
+    number refreshes on every daily rebuild instead of only when someone
+    remembers to edit the markdown."""
+    m = re.search(r"set radio\s+([\d.]+),([\d.]+),(\d+),(\d+)", md_text)
+    if not m:
+        return None
+    key = bucket({"freq": m.group(1), "bw": m.group(2), "sf": m.group(3), "cr": m.group(4)})
+    fresh = [p for p in points if p["c"] == country and p["ad"] is not None and p["ad"] <= 7]
+    sample = fresh if fresh else [p for p in points if p["c"] == country]
+    if not sample:
+        return None
+    match = sum(1 for p in sample if p["b"] == key)
+    return round(100 * match / len(sample), 1)
+
+
+def load_community_bundles(points):
     """Read scripts/communities/<lang>/<CODE>.md for every language x country
     combination. Fallback chain per (lang, code): that language's own file ->
     en/<CODE>.md -> sk/<CODE>.md. Returns {lang: {country_code: html}}, with
@@ -544,7 +565,11 @@ def load_community_bundles():
             if code not in COUNTRIES:
                 log(f"skipping scripts/communities/{lang}/{f.name} — {code!r} is not a known country code")
                 continue
-            raw[lang][code] = render_markdown(f.read_text(encoding="utf-8"))
+            text = f.read_text(encoding="utf-8")
+            if "{{PCT}}" in text:
+                pct = live_preset_pct(text, code, points)
+                text = text.replace("{{PCT}}", f"{pct:.1f}" if pct is not None else "?")
+            raw[lang][code] = render_markdown(text)
 
     bundles = {lang: {} for lang in LANGUAGES}
     for lang in LANGUAGES:
@@ -594,7 +619,7 @@ def main():
     else:
         log("not enough history yet for a migration Sankey (need >=2 days)")
 
-    communities = load_community_bundles()
+    communities = load_community_bundles(points)
     for lang in LANGUAGES:
         log(f"community bundle '{lang}': {len(communities[lang])}/{len(COUNTRIES)} countries resolved")
 

@@ -8,7 +8,7 @@
 
 **Community-official preset:** "EU/UK Narrow, Switzerland" `869.618/62.5/SF8/CR8` — [meshcore.com.ro](https://meshcore.com.ro/), tied to Romania's allowed 869.40–869.65MHz range. Match with map data: ✅ yes.
 
-**Command for the network's dominant preset** (~90.8% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8

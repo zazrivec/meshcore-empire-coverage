@@ -13,7 +13,7 @@
 
 **Community-official preset:** "Europe/UK Narrow" `869.618/62.5/SF8/CR8` — [meshcore.si/nastavitve](https://www.meshcore.si/nastavitve.php), the most detailed source found (also covers duty-cycle/EIRP/airtime factor). Match with map data: ✅ yes.
 
-**Command for the network's dominant preset** (~90.5% of nodes):
+**Command for the network's dominant preset** (~{{PCT}}% of nodes):
 
 ```
 set radio 869.618,62.5,8,8
