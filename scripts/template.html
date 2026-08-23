@@ -516,6 +516,9 @@ document.getElementById('headline-callout').innerHTML =
   `<b>PL</b> je väčšinovo SF8/CR8 (${pct('PL','sf8cr8')}%) s výrazným vedľajším zhlukom SF6/CR8 (${pct('PL','pl_sf6cr8')}%), ktorý nemá oficiálny preset.`;
 
 document.getElementById('findings').innerHTML = `
+  <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 10px">
+    <b>Stav k:</b> __BUILD_DATE__ — čísla a percentá nižšie sú vyjadrením k tomuto konkrétnemu buildu, nie trvalým faktom; sieť sa mení deň čo deň (pozri sekciu „Trendy" vyššie).
+  </p>
   <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;padding-left:20px">
     <li><b>Zaradenie krajiny:</b> primárne podľa GPS (point-in-polygon voči reálnym hraniciam SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR), prefix v názve sa použije len ak repeater nemá súradnice — v aktuálnom datasete to nebol žiadny prípad, prefix fallback je teda len poistka do budúcna.</li>
     <li><b>CZ (${allStats.CZ.total} repeaterov):</b> ${pct('CZ','cz_narrow')}% na 869.432MHz/SF7/CR5 („Czech Republic Narrow&rdquo;) — inak než všetci susedia, ktorí sedia na 869.618MHz. Podľa <a href="https://meshcore.cz/" target="_blank" rel="noopener">meshcore.cz</a> ide o zámernú odchýlku, nie chybu: vlastná frekvencia dáva českej sieti samostatný 10&nbsp;% duty-cycle limit nezávislý od zvyšku EU/UK bloku. Český repeater sa nedomovie ani s SK/HU/NL presetom (rovnaké SF/CR, iná frekvencia), ani so SF8/CR8 blokom.</li>
