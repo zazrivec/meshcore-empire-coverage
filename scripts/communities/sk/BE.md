@@ -11,6 +11,8 @@
 
 MeshCore prišiel do Belgicka koncom roka 2025 vďaka skupine rádioamatérov "73s.be" (ON3DZG Gerald, ON7KHZ Koen, ON7MHZ Pieter). Komunita preklenuje flámsky (holandský) aj valónsky (francúzsky) región cez spoločné Discord a Telegram kanály. Odporúčaný preset pre Belgicko: EU/UK (Narrow), pásmo 868MHz.
 
+**Oficiálny preset komunity:** „EU/UK (Narrow)" — [loramesh.be](https://www.loramesh.be/meshcore-repeater-instellingen/) opakovane píše „vždy používaj EU/UK (Narrow)", presné čísla priamo neuvedené. Zhoda s dátami mapy: ✅ áno podľa mena.
+
 **Príkaz pre dominantný preset v sieti** (~91.1% uzlov):
 
 ```

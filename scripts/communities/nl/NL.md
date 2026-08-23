@@ -10,6 +10,8 @@
 
 Regionale structuur op basis van provincies (Noord-Holland, Zuid-Holland, Utrecht, Gelderland, Brabant...) — een repeater krijgt de tags `nl` + `nl-<provincie>` (bijv. `nl-dr` voor Drenthe). Coördinatie verloopt via de Telegram-groep.
 
+**Community-officiële preset:** de verplichte "Netherlands" preset `869.618/62.5/SF7/CR5` — [localmesh.nl](https://www.localmesh.nl/en/meshcore-repeater-setup/) benadrukt herhaaldelijk dat iedereen deze moet gebruiken. Overeenkomst met kaartdata: ✅ ja (66.3% — de rest zijn nog niet gemigreerde nodes).
+
 **Commando voor de dominante preset in dit netwerk** (~66.3% van de nodes):
 
 ```

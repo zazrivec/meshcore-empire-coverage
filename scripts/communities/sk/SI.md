@@ -11,6 +11,8 @@
 - [mapme.sh](https://mapme.sh/) — alternatívna mapa pokrytia.
 - [map.meshcore.io](https://map.meshcore.io/) — oficiálna globálna mapa.
 
+**Oficiálny preset komunity:** „Europe/UK Narrow" `869.618/62.5/SF8/CR8` — [meshcore.si/nastavitve](https://www.meshcore.si/nastavitve.php), najdetailnejší nájdený zdroj (uvádza aj duty-cycle/EIRP/airtime faktor). Zhoda s dátami mapy: ✅ áno.
+
 **Príkaz pre dominantný preset v sieti** (~90.5% uzlov):
 
 ```

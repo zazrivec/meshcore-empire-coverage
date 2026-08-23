@@ -12,6 +12,8 @@
 - [t.me/meshcorede](https://t.me/meshcorede) — Telegram skupina.
 - [meshcore.ninja — MeshCore DE](https://meshcore.ninja/network/meshcore-de/) — prehľad siete.
 
+**Oficiálny preset komunity:** „EU/UK (Narrow)" `869.618/62.5/SF8/CR8` — [meshcore-de.fyi](https://meshcore-de.fyi/meshcore:allgemeines:empfohlene-konfiguration) ho odporúča priamo príkazom `set radio 869.618,62.5,8,8`. Zhoda s dátami mapy: ✅ áno.
+
 **Príkaz pre dominantný preset v sieti** (~82.4% uzlov):
 
 ```

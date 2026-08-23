@@ -6,6 +6,8 @@
 
 A magyar hálózat Szlovákia és Ausztria felé is bővül.
 
+**Közösségi hivatalos preset:** a "Hungary" preset — a [meshcore.hu](https://mc868.hu/) megerősíti az SF7-re való átállást (2026.08.08-i migráció); a többi paraméter (869.618/62.5/CR5) a preset nevéből következik. Egyezés a térképadatokkal: ✅ igen (52.9% — ugyanaz az ok, mint SK esetében, folyamatban lévő migráció).
+
 **Parancs a hálózatban domináns preset beállításához** (~52.9% csomópont):
 
 ```

@@ -12,6 +12,8 @@
 - [map.meshcore.dev](https://map.meshcore.dev/) — official global map.
 - [Facebook group](https://www.facebook.com/groups/9587060018050008)
 
+**Community-official preset:** "Narrow" (= EU/UK Narrow) `869.618/62.5/SF8/CR8` — [meshcore.ch/settings](https://www.meshcore.ch/settings/), tied to the Swiss BAKOM 10% duty-cycle rule. Match with map data: ✅ yes.
+
 **Command for the network's dominant preset** (~86.4% of nodes):
 
 ```

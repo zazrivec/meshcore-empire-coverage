@@ -11,6 +11,8 @@
 - [Discord](https://discord.gg/ceu3nmcUBK) — community Discord server.
 - [MeshCore Quick Start Guide (Danish, PDF)](https://www.meshhub.dk/wp-content/uploads/2026/07/MeshCore_Quick_Start_Guide-App-Dansk.pdf)
 
+**Community-official preset:** "Standard for DK" `869.618/62.5/SF8/CR8` + `set dutycycle 10` — [meshhub.dk/radio-settings](https://www.meshhub.dk/radio-settings/). Match with map data: ✅ yes.
+
 **Command for the network's dominant preset** (~95.0% of nodes):
 
 ```

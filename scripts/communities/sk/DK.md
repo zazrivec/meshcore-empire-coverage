@@ -11,6 +11,8 @@
 - [Discord](https://discord.gg/ceu3nmcUBK) — komunitný Discord server.
 - [MeshCore Quick Start Guide (dánsky, PDF)](https://www.meshhub.dk/wp-content/uploads/2026/07/MeshCore_Quick_Start_Guide-App-Dansk.pdf)
 
+**Oficiálny preset komunity:** „Standard for DK" `869.618/62.5/SF8/CR8` + `set dutycycle 10` — [meshhub.dk/radio-settings](https://www.meshhub.dk/radio-settings/). Zhoda s dátami mapy: ✅ áno.
+
 **Príkaz pre dominantný preset v sieti** (~95.0% uzlov):
 
 ```

@@ -10,6 +10,8 @@
 
 Regionálna štruktúra podľa provincií (Noord-Holland, Zuid-Holland, Utrecht, Gelderland, Brabant...) — repeater dostáva tagy `nl` + `nl-<provincia>` (napr. `nl-dr` pre Drenthe). Koordinácia prebieha cez Telegram skupinu.
 
+**Oficiálny preset komunity:** povinný „Netherlands" preset `869.618/62.5/SF7/CR5` — [localmesh.nl](https://www.localmesh.nl/en/meshcore-repeater-setup/) opakovane zdôrazňuje, že ho musia použiť všetci. Zhoda s dátami mapy: ✅ áno (66.3 % — zvyšok sú zatiaľ nemigrované uzly).
+
 **Príkaz pre dominantný preset v sieti** (~66.3% uzlov):
 
 ```

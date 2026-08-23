@@ -11,6 +11,8 @@
 
 Poľská sieť má okrem dominantného SF8/CR8 (v súlade s DE/AT/CH blokom) aj výrazný vedľajší SF6/CR8 zhluk bez oficiálneho mena — pozri sekciu "Rozdelenie rádiových parametrov" vyššie.
 
+**Oficiálny preset komunity:** „EU/UK Narrow" (potvrdené menom, presné čísla priamo na stránke neuvedené) — [meshcorepolska.org/dokumentacja](https://meshcorepolska.org/dokumentacja/meshcore). Zhoda s dátami mapy: ✅ áno podľa mena (79.1 %) — samostatný SF6/CR8 zhluk (~10 %) zostáva v komunitných zdrojoch bez vysvetlenia.
+
 **Príkaz pre dominantný preset v sieti** (~79.1% uzlov):
 
 ```

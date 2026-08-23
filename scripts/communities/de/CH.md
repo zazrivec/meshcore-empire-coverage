@@ -12,6 +12,8 @@
 - [map.meshcore.dev](https://map.meshcore.dev/) — offizielle globale Karte.
 - [Facebook-Gruppe](https://www.facebook.com/groups/9587060018050008)
 
+**Offizieller Community-Preset:** "Narrow" (= EU/UK Narrow) `869.618/62.5/SF8/CR8` — [meshcore.ch/settings](https://www.meshcore.ch/settings/), gekoppelt an die Schweizer BAKOM-Regel von 10% Duty-Cycle. Übereinstimmung mit den Kartendaten: ✅ ja.
+
 **Befehl für den in diesem Netz dominanten Preset** (~86.4% der Knoten):
 
 ```

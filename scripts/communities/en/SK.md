@@ -8,6 +8,8 @@
 
 Community centred around OM3KFF/OM5M (Bratislava), with regular meetups **every Thursday at 17:30** at Rádioklub Omega, Staré Grunty 53, Mlynská dolina.
 
+**Community-official preset:** the "Slovakia" preset `869.618/62.5/SF7/CR5` — [mesh.om3kff.sk](https://mesh.om3kff.sk) explicitly announced a network-wide migration to this preset on 2026-08-08 (the older setting is no longer compatible). Match with map data: ✅ yes (68.8% — the shortfall is unmigrated/unrebooted nodes, not a disagreement in what's recommended).
+
 **Command for the network's dominant preset** (~68.8% of nodes):
 
 ```

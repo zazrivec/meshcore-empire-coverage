@@ -10,6 +10,8 @@
 - [lemcit.lu](https://www.lemcit.lu/)
 - [beprepared.lu](https://www.beprepared.lu/) — príprava na núdzové situácie, relevantné pre využitie MeshCore ako záložnej komunikácie.
 
+**Oficiálny preset komunity:** „EU/UK Narrow" preset — [meshcore.lu](https://www.meshcore.lu/). Zhoda s dátami mapy: ✅ áno.
+
 **Príkaz pre dominantný preset v sieti** (~94.8% uzlov):
 
 ```

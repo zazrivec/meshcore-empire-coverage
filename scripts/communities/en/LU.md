@@ -10,6 +10,8 @@
 - [lemcit.lu](https://www.lemcit.lu/)
 - [beprepared.lu](https://www.beprepared.lu/) — emergency preparedness, relevant for using MeshCore as backup communication.
 
+**Community-official preset:** the "EU/UK Narrow" preset — [meshcore.lu](https://www.meshcore.lu/). Match with map data: ✅ yes.
+
 **Command for the network's dominant preset** (~94.8% of nodes):
 
 ```

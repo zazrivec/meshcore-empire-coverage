@@ -14,6 +14,8 @@
 
 The Czech preset (869.432MHz/BW62.5/SF7/CR5, "Czech Republic Narrow") runs on a different frequency than the surrounding SK/HU/NL and AT/DE/SI blocks — see the "Radio parameter breakdown" section above.
 
+**Community-official preset:** `869.432/62.5/SF7/CR5` — [meshcore.cz](https://meshcore.cz/) states this frequency is a deliberate deviation from the default, giving the Czech network its own 10% duty-cycle allowance independent of the rest of the EU/UK block. Match with map data: ✅ yes (98.8%).
+
 **Command for the network's dominant preset** (~98.8% of nodes):
 
 ```
