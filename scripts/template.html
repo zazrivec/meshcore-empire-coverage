@@ -517,7 +517,8 @@ document.getElementById('headline-callout').innerHTML =
 
 document.getElementById('findings').innerHTML = `
   <p style="font-size:0.85rem;color:var(--text-secondary);margin:0 0 10px">
-    <b>Stav k:</b> __BUILD_DATE__ — čísla a percentá nižšie sú vyjadrením k tomuto konkrétnemu buildu, nie trvalým faktom; sieť sa mení deň čo deň (pozri sekciu „Trendy" vyššie).
+    <b>Čísla a percentá nižšie:</b> dáta k __BUILD_DATE__ (prepočítava sa pri každom dennom builde, pozri sekciu „Trendy" vyššie pre vývoj v čase).<br>
+    <b>Textová analýza/tvrdenia nižšie:</b> naposledy overené __FINDINGS_DATE__ — nejde o hodnotu prepočítavanú pri každom builde, len o čísla v nej.
   </p>
   <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;padding-left:20px">
     <li><b>Zaradenie krajiny:</b> primárne podľa GPS (point-in-polygon voči reálnym hraniciam SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR), prefix v názve sa použije len ak repeater nemá súradnice — v aktuálnom datasete to nebol žiadny prípad, prefix fallback je teda len poistka do budúcna.</li>

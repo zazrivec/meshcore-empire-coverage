@@ -57,6 +57,14 @@ LANGUAGES = ["sk", "en", "de", "hu", "cs", "nl"]
 DEFAULT_LANG = "sk"
 FALLBACK_LANG = "en"
 
+# The "Zistenia" section mixes two things with very different freshness:
+# live numbers (recomputed every build from that day's data) and hand-
+# written qualitative analysis/claims (only changes when a human revises
+# the text). Bump this manually whenever that prose is edited — it must
+# NOT track today's date automatically, or it would falsely imply the
+# analysis itself was re-verified on every daily rebuild.
+FINDINGS_REVIEWED_DATE = "2026-08-23"
+
 UI_STRINGS = {
     "sk": {
         "lang_name": "Slovenčina",
@@ -591,7 +599,8 @@ def render(points, borders, trends, migration, communities):
 
     html = (template
             .replace("__DATA__", json.dumps(data))
-            .replace("__BUILD_DATE__", build_date))
+            .replace("__BUILD_DATE__", build_date)
+            .replace("__FINDINGS_DATE__", FINDINGS_REVIEWED_DATE))
     return html
 
 
