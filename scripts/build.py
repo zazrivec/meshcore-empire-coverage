@@ -49,8 +49,8 @@ COMMUNITIES_DIR = SCRIPTS_DIR / "communities"
 OUTPUT_PATH = REPO_ROOT / "index.html"
 
 # Only the "Community & coordination pages" section is localized — the rest of
-# the report (charts, headings, findings) stays Slovak. sk has all 17 country
-# files authored directly; en is a full translated fallback for all 17; the
+# the report (charts, headings, findings) stays Slovak. sk has all 29 country
+# files authored directly; en is a full translated fallback for all 29; the
 # other languages only translate the countries most relevant to them (see
 # scripts/communities/<lang>/ — missing files fall back to en, then sk).
 LANGUAGES = ["sk", "en", "de", "hu", "cs", "nl"]
@@ -63,7 +63,7 @@ FALLBACK_LANG = "en"
 # the text). Bump this manually whenever that prose is edited — it must
 # NOT track today's date automatically, or it would falsely imply the
 # analysis itself was re-verified on every daily rebuild.
-FINDINGS_REVIEWED_DATE = "2026-08-23"
+FINDINGS_REVIEWED_DATE = "2026-08-27"
 
 UI_STRINGS = {
     "sk": {
@@ -108,10 +108,12 @@ NEW_KEY = "_new_"        # synthetic source in the migration Sankey: net growth 
 REMOVED_KEY = "_removed_"  # synthetic target: net shrinkage not absorbed by any growing bucket
 
 COUNTRIES = ["SK", "AT", "HU", "CZ", "DE", "SI", "PL", "IT",
-             "CH", "BE", "NL", "LU", "UA", "DK", "HR", "RO", "GR"]
+             "CH", "BE", "NL", "LU", "UA", "DK", "HR", "RO", "GR",
+             "FR", "LT", "BG", "ES", "PT", "SE", "LV", "IE", "EE", "FI",
+             "NO", "GB"]
 
 BUCKET_KEYS = ["sf8cr8", "sf7cr5", "cz_narrow", "sf8cr5", "pl_sf6cr8",
-               "eu433", "sf7cr8", "eu_dep", "other"]
+               "eu433", "sf7cr8", "eu_dep", "ib_sf7cr6", "other"]
 
 REPEATER_TYPE = 2
 
@@ -157,6 +159,8 @@ def bucket(params):
         return "pl_sf6cr8"
     if freq == 869.618 and bw == 62.5 and sf == 7 and cr == 8:
         return "sf7cr8"
+    if freq == 869.618 and bw == 62.5 and sf == 7 and cr == 6:
+        return "ib_sf7cr6"
     if freq == 869.525 and bw == 250.0 and sf == 11 and cr == 5:
         return "eu_dep"
     return "other"
@@ -512,27 +516,39 @@ COUNTRY_NAMES = {
     "sk": {"SK": "Slovensko", "AT": "Rakúsko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Nemecko",
            "SI": "Slovinsko", "PL": "Poľsko", "IT": "Taliansko", "CH": "Švajčiarsko", "BE": "Belgicko",
            "NL": "Holandsko", "LU": "Luxembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvátsko",
-           "RO": "Rumunsko", "GR": "Grécko"},
+           "RO": "Rumunsko", "GR": "Grécko", "FR": "Francúzsko", "LT": "Litva", "BG": "Bulharsko",
+           "ES": "Španielsko", "PT": "Portugalsko", "SE": "Švédsko", "LV": "Lotyšsko",
+           "IE": "Írsko", "EE": "Estónsko", "FI": "Fínsko", "NO": "Nórsko", "GB": "Spojené kráľovstvo"},
     "en": {"SK": "Slovakia", "AT": "Austria", "HU": "Hungary", "CZ": "Czechia", "DE": "Germany",
            "SI": "Slovenia", "PL": "Poland", "IT": "Italy", "CH": "Switzerland", "BE": "Belgium",
            "NL": "Netherlands", "LU": "Luxembourg", "UA": "Ukraine", "DK": "Denmark", "HR": "Croatia",
-           "RO": "Romania", "GR": "Greece"},
+           "RO": "Romania", "GR": "Greece", "FR": "France", "LT": "Lithuania", "BG": "Bulgaria",
+           "ES": "Spain", "PT": "Portugal", "SE": "Sweden", "LV": "Latvia",
+           "IE": "Ireland", "EE": "Estonia", "FI": "Finland", "NO": "Norway", "GB": "United Kingdom"},
     "de": {"SK": "Slowakei", "AT": "Österreich", "HU": "Ungarn", "CZ": "Tschechien", "DE": "Deutschland",
            "SI": "Slowenien", "PL": "Polen", "IT": "Italien", "CH": "Schweiz", "BE": "Belgien",
            "NL": "Niederlande", "LU": "Luxemburg", "UA": "Ukraine", "DK": "Dänemark", "HR": "Kroatien",
-           "RO": "Rumänien", "GR": "Griechenland"},
+           "RO": "Rumänien", "GR": "Griechenland", "FR": "Frankreich", "LT": "Litauen", "BG": "Bulgarien",
+           "ES": "Spanien", "PT": "Portugal", "SE": "Schweden", "LV": "Lettland",
+           "IE": "Irland", "EE": "Estland", "FI": "Finnland", "NO": "Norwegen", "GB": "Vereinigtes Königreich"},
     "hu": {"SK": "Szlovákia", "AT": "Ausztria", "HU": "Magyarország", "CZ": "Csehország", "DE": "Németország",
            "SI": "Szlovénia", "PL": "Lengyelország", "IT": "Olaszország", "CH": "Svájc", "BE": "Belgium",
            "NL": "Hollandia", "LU": "Luxemburg", "UA": "Ukrajna", "DK": "Dánia", "HR": "Horvátország",
-           "RO": "Románia", "GR": "Görögország"},
+           "RO": "Románia", "GR": "Görögország", "FR": "Franciaország", "LT": "Litvánia", "BG": "Bulgária",
+           "ES": "Spanyolország", "PT": "Portugália", "SE": "Svédország", "LV": "Lettország",
+           "IE": "Írország", "EE": "Észtország", "FI": "Finnország", "NO": "Norvégia", "GB": "Egyesült Királyság"},
     "cs": {"SK": "Slovensko", "AT": "Rakousko", "HU": "Maďarsko", "CZ": "Česko", "DE": "Německo",
            "SI": "Slovinsko", "PL": "Polsko", "IT": "Itálie", "CH": "Švýcarsko", "BE": "Belgie",
            "NL": "Nizozemsko", "LU": "Lucembursko", "UA": "Ukrajina", "DK": "Dánsko", "HR": "Chorvatsko",
-           "RO": "Rumunsko", "GR": "Řecko"},
+           "RO": "Rumunsko", "GR": "Řecko", "FR": "Francie", "LT": "Litva", "BG": "Bulharsko",
+           "ES": "Španělsko", "PT": "Portugalsko", "SE": "Švédsko", "LV": "Lotyšsko",
+           "IE": "Irsko", "EE": "Estonsko", "FI": "Finsko", "NO": "Norsko", "GB": "Spojené království"},
     "nl": {"SK": "Slowakije", "AT": "Oostenrijk", "HU": "Hongarije", "CZ": "Tsjechië", "DE": "Duitsland",
            "SI": "Slovenië", "PL": "Polen", "IT": "Italië", "CH": "Zwitserland", "BE": "België",
            "NL": "Nederland", "LU": "Luxemburg", "UA": "Oekraïne", "DK": "Denemarken", "HR": "Kroatië",
-           "RO": "Roemenië", "GR": "Griekenland"},
+           "RO": "Roemenië", "GR": "Griekenland", "FR": "Frankrijk", "LT": "Litouwen", "BG": "Bulgarije",
+           "ES": "Spanje", "PT": "Portugal", "SE": "Zweden", "LV": "Letland",
+           "IE": "Ierland", "EE": "Estland", "FI": "Finland", "NO": "Noorwegen", "GB": "Verenigd Koninkrijk"},
 }
 
 

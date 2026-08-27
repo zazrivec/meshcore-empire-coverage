@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%93%A1%3C/text%3E%3C/svg%3E">
-<title>MeshCore Coverage: SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR</title>
+<title>MeshCore Coverage: SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR/FR/LT/BG/ES/PT/SE/LV/IE/EE/FI/NO/GB</title>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-N46ZGZSD7S"></script>
 <script>
@@ -153,7 +153,7 @@
 </head>
 <body>
 <div class="wrap">
-  <h1>Rádiové pokrytie MeshCore: 17 krajín Európy</h1>
+  <h1>Rádiové pokrytie MeshCore: 29 krajín Európy</h1>
   <p class="subtitle">Repeatery zaradené do krajiny podľa GPS súradníc (point-in-polygon proti reálnym hraniciam); ak repeater súradnice nemá, dopĺňa sa podľa prefixu v názve. Lokálny build z dát map.meshcore.io.</p>
 
   <div class="meta-row">
@@ -322,8 +322,8 @@ function copyShareLink(btn, hash) {
   });
 }
 
-const countryOrder = ['SK','AT','HU','CZ','DE','SI','PL','IT','CH','BE','NL','LU','UA','DK','HR','RO','GR'];
-const countryLabel = { SK:'Slovensko', AT:'Rakúsko', HU:'Maďarsko', CZ:'Česko', DE:'Nemecko', SI:'Slovinsko', PL:'Poľsko', IT:'Taliansko', CH:'Švajčiarsko', BE:'Belgicko', NL:'Holandsko', LU:'Luxembursko', UA:'Ukrajina', DK:'Dánsko', HR:'Chorvátsko', RO:'Rumunsko', GR:'Grécko' };
+const countryOrder = ['SK','AT','HU','CZ','DE','SI','PL','IT','CH','BE','NL','LU','UA','DK','HR','RO','GR','FR','LT','BG','ES','PT','SE','LV','IE','EE','FI','NO','GB'];
+const countryLabel = { SK:'Slovensko', AT:'Rakúsko', HU:'Maďarsko', CZ:'Česko', DE:'Nemecko', SI:'Slovinsko', PL:'Poľsko', IT:'Taliansko', CH:'Švajčiarsko', BE:'Belgicko', NL:'Holandsko', LU:'Luxembursko', UA:'Ukrajina', DK:'Dánsko', HR:'Chorvátsko', RO:'Rumunsko', GR:'Grécko', FR:'Francúzsko', LT:'Litva', BG:'Bulharsko', ES:'Španielsko', PT:'Portugalsko', SE:'Švédsko', LV:'Lotyšsko', IE:'Írsko', EE:'Estónsko', FI:'Fínsko', NO:'Nórsko', GB:'Spojené kráľovstvo' };
 const BUCKETS = [
   { key: 'sf8cr8',     label: 'SF8/CR8 · 869.618MHz',  desc: 'EU/UK Narrow, Switzerland',      color: '#2a78d6' },
   { key: 'sf7cr5',     label: 'SF7/CR5 · 869.618MHz',  desc: 'Slovakia / Hungary / Netherlands', color: '#eb6834' },
@@ -332,6 +332,7 @@ const BUCKETS = [
   { key: 'pl_sf6cr8',  label: 'SF6/CR8 · 869.618MHz',  desc: 'bez oficiálneho mena, takmer výhradne PL', color: '#e87ba4' },
   { key: 'eu433',      label: '433MHz pásmo',          desc: 'EU 433MHz Narrow/Long Range, najmä IT',    color: '#4a3aa7' },
   { key: 'sf7cr8',     label: 'SF7/CR8 · 869.618MHz',  desc: 'bez oficiálneho mena, takmer výhradne NL', color: '#008300' },
+  { key: 'ib_sf7cr6',  label: 'SF7/CR6 · 869.618MHz',  desc: 'bez oficiálneho mena, takmer výhradne ES/PT', color: '#9c4dcc' },
   { key: 'eu_dep',     label: 'SF11/CR5 · BW250 · 869.525MHz', desc: 'EU/UK (Deprecated)',        color: '#e34948' },
   { key: 'other',      label: 'Iné',                   desc: 'zvyšné/nezhodné kombinácie',      color: '#8a8474' },
 ];
@@ -386,6 +387,9 @@ function computeStats(filterKey) {
 const COUNTRY_AREA_KM2 = {
   SK:49035, AT:83879, HU:93030, CZ:78871, DE:357022, SI:20273, PL:312696, IT:301340,
   CH:41285, BE:30528, NL:41850, LU:2586, UA:603628, DK:42933, HR:56594, RO:238397, GR:131957,
+  FR:551695, LT:65300, BG:110879,
+  ES:505990, PT:92212, SE:450295, LV:64589, IE:70273, EE:45227, FI:338424,
+  NO:385207, GB:243610,
 };
 // Density reacts to the freshness-chip selection, same as the count above it.
 let densityByCountry = {};
@@ -505,6 +509,7 @@ document.getElementById('fresh-table').innerHTML = countryOrder.map(c => {
 }).join('');
 
 const allStats = computeStats('d7');
+const allTimeStats = computeStats('all');
 function pct(country, key) {
   const s = allStats[country];
   return s.total ? Math.round(100*s.counts[key]/s.total) : 0;
@@ -521,7 +526,7 @@ document.getElementById('findings').innerHTML = `
     <b>Textová analýza/tvrdenia nižšie:</b> naposledy overené __FINDINGS_DATE__ — nejde o hodnotu prepočítavanú pri každom builde, len o čísla v nej.
   </p>
   <ul style="font-size:0.9rem;color:var(--text-secondary);line-height:1.7;padding-left:20px">
-    <li><b>Zaradenie krajiny:</b> primárne podľa GPS (point-in-polygon voči reálnym hraniciam SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR), prefix v názve sa použije len ak repeater nemá súradnice — v aktuálnom datasete to nebol žiadny prípad, prefix fallback je teda len poistka do budúcna.</li>
+    <li><b>Zaradenie krajiny:</b> primárne podľa GPS (point-in-polygon voči reálnym hraniciam SK/AT/HU/CZ/DE/SI/PL/IT/CH/BE/NL/LU/UA/DK/HR/RO/GR/FR/LT/BG/ES/PT/SE/LV/IE/EE/FI/NO/GB), prefix v názve sa použije len ak repeater nemá súradnice — v aktuálnom datasete to nebol žiadny prípad, prefix fallback je teda len poistka do budúcna.</li>
     <li><b>CZ (${allStats.CZ.total} repeaterov):</b> ${pct('CZ','cz_narrow')}% na 869.432MHz/SF7/CR5 („Czech Republic Narrow&rdquo;) — inak než všetci susedia, ktorí sedia na 869.618MHz. Podľa <a href="https://meshcore.cz/" target="_blank" rel="noopener">meshcore.cz</a> ide o zámernú odchýlku, nie chybu: vlastná frekvencia dáva českej sieti samostatný 10&nbsp;% duty-cycle limit nezávislý od zvyšku EU/UK bloku. Český repeater sa nedomovie ani s SK/HU/NL presetom (rovnaké SF/CR, iná frekvencia), ani so SF8/CR8 blokom.</li>
     <li><b>PL (${allStats.PL.total} repeaterov):</b> ${pct('PL','sf8cr8')}% SF8/CR8, ale ${pct('PL','pl_sf6cr8')}% (${allStats.PL.counts.pl_sf6cr8}) beží na SF6/CR8 — kombinácii, ktorá sa nenachádza v odporúčaných presetoch API a je takmer výhradne poľská (274/275 nájdených v celej osmičke). Oficiálna dokumentácia (<a href="https://meshcorepolska.org/dokumentacja/meshcore" target="_blank" rel="noopener">meshcorepolska.org</a>) menuje len dominantný „EU/UK Narrow&rdquo; preset — samostatný SF6/CR8 zhluk zostáva aj v komunitných zdrojoch bez vysvetlenia.</li>
     <li><b>DE (${allStats.DE.total} repeaterov):</b> najväčšia populácia v tejto osmičke, ${pct('DE','sf8cr8')}% SF8/CR8 — v súlade s AT a SI.</li>
@@ -536,8 +541,19 @@ document.getElementById('findings').innerHTML = `
     <li><b>UA (${allStats.UA.total} repeaterov):</b> zatiaľ len ${allStats.UA.total} uzlov v datasete — príliš malá vzorka na spoľahlivý záver, ale zatiaľ prevažne SF8/CR8.</li>
     <li><b>DK (${allStats.DK.total} repeaterov):</b> ${pct('DK','sf8cr8')}% SF8/CR8 — v súlade s DE/AT/CH blokom, prekvapivo veľká vzorka na dánsku sieť.</li>
     <li><b>RO (${allStats.RO.total} repeaterov):</b> ${pct('RO','sf8cr8')}% SF8/CR8, podobne ako zvyšok SF8/CR8 bloku.</li>
-    <li><b>GR (${allStats.GR.total} repeaterov):</b> malá vzorka, ${pct('GR','sf8cr8')}% SF8/CR8.</li>
-    <li><b>HR (${allStats.HR.total} repeaterov):</b> najmenšia vzorka spomedzi všetkých 17 krajín, zatiaľ takmer celá SF8/CR8.</li>
+    <li><b>GR (${allStats.GR.total} repeaterov v okne ≤7&nbsp;dní, ${allTimeStats.GR.total} celkovo v datasete):</b> v poslednom týždni bez jediného advertu — nejde o chýbajúce dáta, celá grécka vzorka je momentálne staršia než 7 dní (najčerstvejší advert má cez 11 dní). Prepni čerstvosť vyššie na „Všetky&rdquo; alebo „&gt;30&nbsp;dní&rdquo; pre reálny obraz.</li>
+    <li><b>FR (${allStats.FR.total} repeaterov):</b> ${pct('FR','sf8cr8')}% SF8/CR8, s doplnkovým podielom SF8/CR5 (${pct('FR','sf8cr5')}%) — v súlade so zvyškom SF8/CR8 bloku (AT/DE/SI/CH/BE/RO).</li>
+    <li><b>LT (${allStats.LT.total} repeaterov):</b> takmer výhradne SF8/CR8 (${pct('LT','sf8cr8')}%), bez výraznej odchýlky od bloku.</li>
+    <li><b>BG (${allStats.BG.total} repeaterov):</b> ${pct('BG','sf8cr8')}% SF8/CR8 s výrazným podielom SF8/CR5 (${pct('BG','sf8cr5')}%).</li>
+    <li><b>ES + PT — vlastný iberský preset:</b> Španielsko (${allStats.ES.total} rep., ${pct('ES','ib_sf7cr6')}% <b>SF7/CR6</b>) aj Portugalsko (${allStats.PT.total} rep., ${pct('PT','ib_sf7cr6')}% <b>SF7/CR6</b>) sú väčšinovo na kombinácii 869.618MHz/SF7/CR6 — tá sa nenachádza v žiadnom oficiálnom zozname presetov ani v tomto reporte doteraz nemala vlastný bucket (spadala ticho do „Iné&rdquo;). Nedomovia sa so žiadnym iným SF/CR blokom v tejto analýze. Malá menšina na 433MHz (ES ${pct('ES','eu433')}%, PT ${pct('PT','eu433')}%).</li>
+    <li><b>SE (${allStats.SE.total} repeaterov):</b> ${pct('SE','sf8cr8')}% SF8/CR8 — v súlade so zvyškom bloku.</li>
+    <li><b>LV (${allStats.LV.total} repeaterov):</b> takmer výhradne SF8/CR8 (${pct('LV','sf8cr8')}%).</li>
+    <li><b>IE (${allStats.IE.total} repeaterov):</b> ${pct('IE','sf8cr8')}% SF8/CR8, bez výraznej odchýlky od bloku.</li>
+    <li><b>EE (${allStats.EE.total} repeaterov):</b> najmenšia pobaltská vzorka, prakticky celá SF8/CR8.</li>
+    <li><b>FI (${allStats.FI.total} repeaterov):</b> zatiaľ len ${allStats.FI.total} uzlov v datasete — malá vzorka, ${pct('FI','sf8cr8')}% SF8/CR8.</li>
+    <li><b>NO (${allStats.NO.total} repeaterov):</b> reálne rozdelená sieť — ${pct('NO','sf8cr8')}% SF8/CR8 vs ${pct('NO','sf8cr5')}% SF8/CR5, bez jasne dominantného presetu.</li>
+    <li><b>GB (${allStats.GB.total} repeaterov):</b> druhá najväčšia populácia v celom datasete (po DE, pred PL) — ${pct('GB','sf8cr8')}% SF8/CR8, ${pct('GB','sf8cr5')}% SF8/CR5.</li>
+    <li><b>HR (${allStats.HR.total} repeaterov):</b> najmenšia vzorka spomedzi všetkých 29 krajín, zatiaľ takmer celá SF8/CR8.</li>
     <li><b>Cross-border dôsledok:</b> na spoločných hraniciach sa stretávajú minimálne tri nekompatibilné rádio-svety — SF7/CR5 (SK), SF8/CR8 (AT/DE/SI/väčšina PL) a Českom izolovaný 869.432MHz preset — bez ručnej zhody nastavení sa uzly medzi nimi nespoja, bez ohľadu na signál/dosah.</li>
     <li><b>Čerstvosť:</b> všetky čísla vyššie sú počítané len z repeaterov s advertom za posledných ≤7&nbsp;dní. Chipy vyššie umožňujú prepnúť na iné okno (napr. „Všetky&rdquo; alebo „&gt;30&nbsp;dní&rdquo;) a porovnať, či sa obraz mení pri zahrnutí starších/opustených uzlov.</li>
   </ul>
@@ -638,7 +654,7 @@ function renderTrends() {
   const grandDeltaPct = grandFirst ? Math.round(grandDelta / grandFirst * 1000) / 10 : 0;
   const grandColor = grandDelta > 0 ? 'var(--series-sf8)' : (grandDelta < 0 ? 'var(--status-stale)' : 'var(--text-muted)');
   document.getElementById('trends-legend').innerHTML =
-    `<span><i style="background:var(--accent)"></i>Repeaterov celkovo (17 krajín): ${grandFirst} → ${grandLast}` +
+    `<span><i style="background:var(--accent)"></i>Repeaterov celkovo (29 krajín): ${grandFirst} → ${grandLast}` +
     ` <b style="color:${grandColor}">(${grandDelta > 0 ? '+' : ''}${grandDelta}, ${grandDeltaPct > 0 ? '+' : ''}${grandDeltaPct}%)</b>` +
     ` za ${trends.dates[0]} → ${trends.dates[n - 1]}</span>`;
 
