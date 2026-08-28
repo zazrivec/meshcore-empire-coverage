@@ -130,6 +130,15 @@
   .legend.clickable span:hover { border-color: var(--accent); }
   .legend.clickable span.off { opacity: 0.4; }
   .legend.clickable span.off i { background: var(--text-muted) !important; }
+  .legend.clickable span.isolated { outline: 2px solid var(--accent); }
+  .filter-bar input[type="range"] { accent-color: var(--accent); }
+  .migration-tooltip {
+    position: absolute; z-index: 5; max-width: 220px; background: var(--surface-1);
+    border: 1px solid var(--border); border-radius: 8px; padding: 8px 10px;
+    font-size: 0.78rem; color: var(--text-secondary); box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    pointer-events: none;
+  }
+  .migration-tooltip b { color: var(--text-primary); }
 
   .bars { display: flex; flex-direction: column; gap: 12px; min-width: 480px; }
   .bar-row { display: grid; grid-template-columns: 62px 1fr 52px; align-items: center; gap: 10px; font-size: 0.82rem; }
@@ -234,15 +243,22 @@
 
   <h3 id="migration-heading" style="font-size:1rem;font-weight:700;margin:28px 0 4px;display:none">Migrácia medzi presetmi</h3>
   <p class="section-note" id="migration-note" style="display:none">
-Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — rovnaký dátumový rozsah ako „Trendy podľa presetu&rdquo; vyššie. <b>Toto nie je sledovanie konkrétnych uzlov</b> (to build ani map.meshcore.io neposkytuje) — je to najmenšia možná realokácia, ktorá vysvetlí zmenu súhrnných počtov medzi prvým a posledným dňom: čo sa dá vysvetliť ako "zostalo na tom istom presete", zostáva na diagonále; zvyšný pokles v jednom presete sa spáruje so zvyšným rastom v inom. Ak sa v tom istom období preset A zmenšil o X a B narástol o X len náhodou (nie skutočným presunom), graf to napriek tomu ukáže ako tok A→B — realita mohla byť iná (napr. časť A odišla úplne zo siete a B pribudlo z nových uzlov). Ľavý stĺpec = preset na začiatku obdobia, pravý stĺpec = na konci. Hrúbka pásu = počet repeaterov. Sivá „Nové&rdquo;/„Zmizli&rdquo; nie sú presety, len zvyšok rastu/poklesu, ktorý sa nedal spárovať s inou zmenou — zámerne neutrálne odtiene šedej, aby sa nepliedli s reálnou farbou žiadneho presetu.
+Odvodená migrácia medzi presetmi v období <b id="migration-since"></b> — rovnaký dátumový rozsah ako „Trendy podľa presetu&rdquo; vyššie. <b>Toto nie je sledovanie konkrétnych uzlov</b> (to build ani map.meshcore.io neposkytuje) — je to najmenšia možná realokácia, ktorá vysvetlí zmenu súhrnných počtov medzi dvoma dňami: čo sa dá vysvetliť ako "zostalo na tom istom presete", zostáva na diagonále; zvyšný pokles v jednom presete sa spáruje so zvyšným rastom v inom. Ak sa v tom istom období preset A zmenšil o X a B narástol o X len náhodou (nie skutočným presunom), graf to napriek tomu ukáže ako tok A→B — realita mohla byť iná (napr. časť A odišla úplne zo siete a B pribudlo z nových uzlov). Prostredný stĺpec je posúvateľný sliderom nižšie na ktorýkoľvek zachytený deň — ľavá polovica grafu tak ukazuje tok od prvého dňa po zvolený deň, pravá polovica od zvoleného dňa po posledný. Hrúbka pásu = počet repeaterov. Sivá „Nové&rdquo;/„Zmizli&rdquo; nie sú presety, len zvyšok rastu/poklesu na krajných dňoch, ktorý sa nedal spárovať s inou zmenou. Nabehnutím myšou na pás sa zvýrazní presne ten tok; kliknutím naň sa detail pripne (užitočné aj na dotykových zariadeniach); kliknutím na preset v legende nižšie sa zvýrazní všetko, čím tento preset v grafe prešiel.
   </p>
   <div class="filter-bar" id="migration-scope-wrap" style="display:none">
     <span class="flabel">Krajina:</span>
     <div class="chip-row" id="migration-scope-chips"></div>
     <button type="button" class="link-btn" onclick="copyShareLink(this, 'migration-heading')">🔗 Kopírovať odkaz</button>
   </div>
-  <div class="chart-wrap" id="migration-chart-wrap" style="display:none">
+  <div class="filter-bar" id="migration-slider-wrap" style="display:none">
+    <span class="flabel">Stredný deň:</span>
+    <input type="range" id="migration-slider" min="0" max="0" step="1" value="0" style="flex:1 1 240px;max-width:420px">
+    <span id="migration-slider-date" style="font-size:0.85rem;color:var(--text-secondary);font-weight:600;min-width:6.5em"></span>
+  </div>
+  <div class="legend clickable" id="migration-legend" style="display:none"></div>
+  <div class="chart-wrap" id="migration-chart-wrap" style="display:none;position:relative">
     <svg class="mapsvg" id="migrationsvg" viewBox="0 0 900 460" xmlns="http://www.w3.org/2000/svg"></svg>
+    <div id="migration-tooltip" class="migration-tooltip" style="display:none"></div>
   </div>
   <p class="section-note" id="migration-empty" style="display:none">Migrácia medzi presetmi potrebuje aspoň 2 dni denných snapshotov (rovnako ako „Trendy podľa presetu&rdquo; vyššie) — zatiaľ je k dispozícii len jeden deň. Vráť sa po ďalšom builde.</p>
 
@@ -806,7 +822,13 @@ function renderPresetTrends() {
 }
 
 // ---- Preset migration Sankey (who moved from what preset to what) ----
-const migration = DATA.migration || { matrix: null, byCountry: {}, fromDate: null, toDate: null };
+// migration.matrix/byCountry/fromDate/toDate (build.py's precomputed first-vs-
+// last-day reconciliation) are no longer read here — kept in DATA for
+// compatibility/possible future use, but superseded below by a client-side
+// reconcileFlow() that can recompute the same reconciliation for ANY pair of
+// tracked days, since every day's per-bucket counts are already available in
+// `trends` (needed for the scrubbable middle column).
+const migration = DATA.migration || { bucketKeys: null, newKey: '_new_', removedKey: '_removed_' };
 const MIGRATION_NEW = migration.newKey || '_new_';
 const MIGRATION_REMOVED = migration.removedKey || '_removed_';
 
@@ -822,47 +844,268 @@ function bucketLabelFor(key) {
   const b = BUCKETS.find(b => b.key === key);
   return b ? b.label : key;
 }
-function matrixForMigrationScope(scope) {
-  if (scope === 'ALL') return migration.matrix;
-  return (migration.byCountry && migration.byCountry[scope]) || {};
+
+// Port of build.py's reconcile_flow(): turns two aggregate bucket-count
+// snapshots into a derived minimum-reallocation flow matrix. See the Python
+// docstring (build.py) for the full rationale — this is a lower-bound
+// plausible-explanation view, not an observed per-node migration.
+function reconcileFlow(countsFrom, countsTo, bucketKeys) {
+  const matrix = {};
+  const bump = (frm, to, n) => {
+    if (n <= 0) return;
+    matrix[frm] = matrix[frm] || {};
+    matrix[frm][to] = (matrix[frm][to] || 0) + n;
+  };
+
+  const remainingSource = {}, remainingSink = {};
+  for (const b of bucketKeys) {
+    remainingSource[b] = countsFrom[b] || 0;
+    remainingSink[b] = countsTo[b] || 0;
+  }
+
+  for (const b of bucketKeys) {
+    const diag = Math.min(remainingSource[b], remainingSink[b]);
+    if (diag > 0) {
+      bump(b, b, diag);
+      remainingSource[b] -= diag;
+      remainingSink[b] -= diag;
+    }
+  }
+
+  const sources = bucketKeys.filter(b => remainingSource[b] > 0).map(b => [b, remainingSource[b]]);
+  const sinks = bucketKeys.filter(b => remainingSink[b] > 0).map(b => [b, remainingSink[b]]);
+  let i = 0, j = 0;
+  while (i < sources.length && j < sinks.length) {
+    const [sb, sv] = sources[i], [tb, tv] = sinks[j];
+    const n = Math.min(sv, tv);
+    bump(sb, tb, n);
+    sources[i][1] -= n;
+    sinks[j][1] -= n;
+    if (sources[i][1] === 0) i++;
+    if (sinks[j][1] === 0) j++;
+  }
+  while (i < sources.length) {
+    if (sources[i][1] > 0) bump(sources[i][0], MIGRATION_REMOVED, sources[i][1]);
+    i++;
+  }
+  while (j < sinks.length) {
+    if (sinks[j][1] > 0) bump(MIGRATION_NEW, sinks[j][0], sinks[j][1]);
+    j++;
+  }
+  return matrix;
+}
+
+// Extract the {bucketKey: count} snapshot for trends.dates[dayIndex], scoped
+// to a country (or 'ALL') — reuses seriesForScope() so this always agrees
+// with "Trendy podľa presetu" about what a given scope/day means.
+function bucketCountsAt(scope, dayIndex, bucketKeys) {
+  const out = {};
+  for (const k of bucketKeys) {
+    const series = seriesForScope(scope, k);
+    out[k] = series[dayIndex] ?? 0;
+  }
+  return out;
+}
+
+// ---- Interactivity state: hover-highlight, click-to-pin a flow, click a
+// preset in the legend to isolate everything it touches. Priority when more
+// than one is active: a pinned flow wins, then an isolated preset, then
+// whatever's currently hovered. ----
+let migrationMidIndex = null;
+let hoverFlow = null;     // {frm, to} | null
+let pinnedFlow = null;    // {frm, to} | null
+let isolatedBucket = null; // bucket key | null
+
+function currentMigrationFocus() {
+  if (pinnedFlow) return { type: 'flow', frm: pinnedFlow.frm, to: pinnedFlow.to };
+  if (isolatedBucket) return { type: 'bucket', key: isolatedBucket };
+  if (hoverFlow) return { type: 'flow', frm: hoverFlow.frm, to: hoverFlow.to };
+  return null;
+}
+function ribbonMatchesFocus(focus, frm, to) {
+  if (!focus) return true;
+  if (focus.type === 'flow') return frm === focus.frm && to === focus.to;
+  return frm === focus.key || to === focus.key;
+}
+function rectMatchesFocus(focus, key) {
+  if (!focus) return true;
+  if (focus.type === 'flow') return key === focus.frm || key === focus.to;
+  return key === focus.key;
+}
+function applyMigrationHighlight() {
+  const focus = currentMigrationFocus();
+  const svg = document.getElementById('migrationsvg');
+  if (!svg) return;
+  svg.querySelectorAll('[data-bucket]').forEach(el => {
+    el.style.opacity = !focus ? '' : (rectMatchesFocus(focus, el.dataset.bucket) ? '1' : '0.15');
+  });
+  svg.querySelectorAll('[data-from]').forEach(el => {
+    el.style.opacity = !focus ? '' : (ribbonMatchesFocus(focus, el.dataset.from, el.dataset.to) ? '0.9' : '0.08');
+  });
+}
+
+function showMigrationTooltip(evt, frm, to, n) {
+  const box = document.getElementById('migration-tooltip');
+  const wrap = document.getElementById('migration-chart-wrap');
+  const rect = wrap.getBoundingClientRect();
+  const x = evt.clientX - rect.left, y = evt.clientY - rect.top;
+  box.innerHTML = `<b>${bucketLabelFor(frm)} → ${bucketLabelFor(to)}</b><br>${n} repeaterov`;
+  box.style.left = Math.max(0, Math.min(x + 12, rect.width - 220)) + 'px';
+  box.style.top = Math.max(0, y - 10) + 'px';
+  box.style.display = 'block';
+}
+function hideMigrationTooltip() {
+  document.getElementById('migration-tooltip').style.display = 'none';
+}
+document.addEventListener('click', e => {
+  if (pinnedFlow && !e.target.closest('#migrationsvg')) {
+    pinnedFlow = null;
+    hideMigrationTooltip();
+    applyMigrationHighlight();
+  }
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && pinnedFlow) {
+    pinnedFlow = null;
+    hideMigrationTooltip();
+    applyMigrationHighlight();
+  }
+});
+
+// Draws one set of ribbons between two adjacent columns (left→middle or
+// middle→right), wiring hover-highlight and click-to-pin on each ribbon.
+function drawRibbons(svg, svgns, matrix, srcOrder, srcPos, dstOrder, dstPos, x0, x1, scale) {
+  const dstCursor = {};
+  for (const d of dstOrder) dstCursor[d] = dstPos[d].y0;
+  for (const frm of srcOrder) {
+    let cursor = srcPos[frm].y0;
+    const outgoing = matrix[frm] || {};
+    for (const to of dstOrder) {
+      const nflow = outgoing[to] || 0;
+      if (nflow <= 0) continue;
+      const h = nflow * scale;
+      const y0a = cursor, y1a = cursor + h;
+      const y0b = dstCursor[to], y1b = dstCursor[to] + h;
+      cursor += h;
+      dstCursor[to] += h;
+      if (h < 0.15) continue;
+
+      const xm = (x0 + x1) / 2;
+      const path = document.createElementNS(svgns, 'path');
+      const d = `M${x0},${y0a} C${xm},${y0a} ${xm},${y0b} ${x1},${y0b} ` +
+                `L${x1},${y1b} C${xm},${y1b} ${xm},${y1a} ${x0},${y1a} Z`;
+      path.setAttribute('d', d);
+      path.setAttribute('fill', bucketColorFor(frm));
+      path.setAttribute('opacity', frm === to ? '0.25' : '0.45');
+      path.style.cursor = 'pointer';
+      path.dataset.from = frm;
+      path.dataset.to = to;
+      const t = document.createElementNS(svgns, 'title');
+      t.textContent = `${bucketLabelFor(frm)} → ${bucketLabelFor(to)}: ${nflow}`;
+      path.appendChild(t);
+      path.addEventListener('mouseenter', () => { hoverFlow = { frm, to }; applyMigrationHighlight(); });
+      path.addEventListener('mouseleave', () => { hoverFlow = null; applyMigrationHighlight(); });
+      path.addEventListener('click', e => {
+        e.stopPropagation();
+        if (pinnedFlow && pinnedFlow.frm === frm && pinnedFlow.to === to) {
+          pinnedFlow = null;
+          hideMigrationTooltip();
+        } else {
+          pinnedFlow = { frm, to };
+          showMigrationTooltip(e, frm, to, nflow);
+        }
+        applyMigrationHighlight();
+      });
+      svg.appendChild(path);
+    }
+  }
 }
 
 function renderMigration() {
-  if (!migration.matrix || !Object.keys(migration.matrix).length) {
+  const n = trends.dates.length;
+  if (n < 2 || !trends.bucketTotals) {
     document.getElementById('migration-empty').style.display = '';
     return;
   }
+  if (migrationMidIndex === null || migrationMidIndex > n - 1) migrationMidIndex = n - 1;
 
   document.getElementById('migration-heading').style.display = '';
   document.getElementById('migration-note').style.display = '';
   document.getElementById('migration-scope-wrap').style.display = '';
+  document.getElementById('migration-slider-wrap').style.display = '';
+  document.getElementById('migration-legend').style.display = '';
   document.getElementById('migration-chart-wrap').style.display = '';
-  document.getElementById('migration-since').textContent = `${migration.fromDate || '?'} → ${migration.toDate || '?'}`;
+  document.getElementById('migration-since').textContent = `${trends.dates[0]} → ${trends.dates[n - 1]}`;
+
+  const slider = document.getElementById('migration-slider');
+  slider.max = String(n - 1);
+  slider.value = String(migrationMidIndex);
+  document.getElementById('migration-slider-date').textContent = trends.dates[migrationMidIndex];
+  if (!slider.dataset.wired) {
+    slider.dataset.wired = '1';
+    slider.addEventListener('input', () => {
+      migrationMidIndex = Number(slider.value);
+      renderMigration();
+    });
+  }
+
+  const legend = document.getElementById('migration-legend');
+  if (!legend.childElementCount) {
+    legend.innerHTML = BUCKETS.map(b =>
+      `<span title="${b.desc}" data-key="${b.key}"><i style="background:${b.color}"></i>${b.label}</span>`
+    ).join('');
+    legend.addEventListener('click', e => {
+      const el = e.target.closest('span');
+      if (!el) return;
+      const key = el.dataset.key;
+      isolatedBucket = (isolatedBucket === key) ? null : key;
+      legend.querySelectorAll('span').forEach(s => s.classList.toggle('isolated', s.dataset.key === isolatedBucket));
+      applyMigrationHighlight();
+    });
+  }
 
   if (!document.getElementById('migration-scope-chips').childElementCount) {
     renderCountryScopeChips('migration-scope-chips');
     onCountryScopeChange(() => renderMigration());
   }
 
-  const matrix = matrixForMigrationScope(activeCountryScope);
+  const scope = activeCountryScope;
   const bucketKeys = migration.bucketKeys || BUCKETS.map(b => b.key);
+
+  const firstCounts = bucketCountsAt(scope, 0, bucketKeys);
+  const midCounts = bucketCountsAt(scope, migrationMidIndex, bucketKeys);
+  const lastCounts = bucketCountsAt(scope, n - 1, bucketKeys);
+
+  // Slider at day 0 makes leftMatrix purely diagonal (reconcileFlow(x,x,...)
+  // always is) — a visually trivial left half, no special-casing needed.
+  // Slider at the last day is the symmetric trivial case on the right half.
+  const leftMatrix = reconcileFlow(firstCounts, midCounts, bucketKeys);
+  const rightMatrix = reconcileFlow(midCounts, lastCounts, bucketKeys);
+
   const leftOrder = [MIGRATION_NEW, ...bucketKeys];
+  const midOrder = [...bucketKeys];
   const rightOrder = [...bucketKeys, MIGRATION_REMOVED];
 
-  const leftTotals = {}, rightTotals = {};
-  for (const frm of leftOrder) {
-    leftTotals[frm] = Object.values(matrix[frm] || {}).reduce((a, v) => a + v, 0);
-  }
+  const leftTotals = {};
+  for (const frm of leftOrder) leftTotals[frm] = Object.values(leftMatrix[frm] || {}).reduce((a, v) => a + v, 0);
+
+  const midTotals = {};
+  for (const k of midOrder) midTotals[k] = midCounts[k] || 0;
+
+  const rightTotals = {};
   for (const to of rightOrder) {
-    rightTotals[to] = leftOrder.reduce((sum, frm) => sum + ((matrix[frm] || {})[to] || 0), 0);
+    rightTotals[to] = midOrder.reduce((sum, frm) => sum + ((rightMatrix[frm] || {})[to] || 0), 0);
   }
 
-  const rawTotal = Object.values(leftTotals).reduce((a, v) => a + v, 0);
   const svg = document.getElementById('migrationsvg');
   const svgns = 'http://www.w3.org/2000/svg';
   svg.innerHTML = '';
 
-  if (rawTotal === 0) {
+  const leftTotal = Object.values(leftTotals).reduce((a, v) => a + v, 0);
+  const rightTotal = Object.values(rightTotals).reduce((a, v) => a + v, 0);
+  const midTotal = midOrder.reduce((s, k) => s + midTotals[k], 0);
+
+  if (leftTotal === 0 && rightTotal === 0 && midTotal === 0) {
     const msg = document.createElementNS(svgns, 'text');
     msg.setAttribute('x', 450); msg.setAttribute('y', 230); msg.setAttribute('text-anchor', 'middle');
     msg.setAttribute('font-size', '13'); msg.setAttribute('fill', 'var(--text-muted)');
@@ -871,10 +1114,13 @@ function renderMigration() {
     return;
   }
 
-  const grandTotal = rawTotal;
-  const W = 900, H = 460, PAD = 20, NODE_W = 14, LABEL_GUTTER = 130;
-  const colGap = W - 2 * PAD - 2 * NODE_W - 2 * LABEL_GUTTER;
-  const xLeft = PAD + LABEL_GUTTER, xRight = xLeft + NODE_W + colGap;
+  const grandTotal = Math.max(leftTotal, rightTotal, midTotal, 1);
+  const W = 900, H = 460, PAD = 20, NODE_W = 14, LABEL_GUTTER = 110;
+  const usableW = W - 2 * PAD - 2 * LABEL_GUTTER - 3 * NODE_W;
+  const colGap = usableW / 2;
+  const xLeft = PAD + LABEL_GUTTER;
+  const xMid = xLeft + NODE_W + colGap;
+  const xRight = xMid + NODE_W + colGap;
   const usableH = H - 2 * PAD;
   const scale = usableH / grandTotal;
 
@@ -889,12 +1135,13 @@ function renderMigration() {
         rect.setAttribute('width', NODE_W); rect.setAttribute('height', h.toFixed(1));
         rect.setAttribute('fill', bucketColorFor(key));
         rect.setAttribute('rx', '2');
+        rect.dataset.bucket = key;
         const t = document.createElementNS(svgns, 'title');
         t.textContent = `${bucketLabelFor(key)}: ${totals[key]}`;
         rect.appendChild(t);
         svg.appendChild(rect);
 
-        if (h > 9) {
+        if (h > 9 && align !== 'none') {
           const label = document.createElementNS(svgns, 'text');
           label.setAttribute('y', (y + h / 2 + 3.5).toFixed(1));
           label.setAttribute('font-size', '11');
@@ -916,51 +1163,25 @@ function renderMigration() {
   }
 
   const leftPos = drawColumn(leftOrder, leftTotals, xLeft, 'left');
+  const midPos = drawColumn(midOrder, midTotals, xMid, 'none');
   const rightPos = drawColumn(rightOrder, rightTotals, xRight, 'right');
 
-  const rightCursor = {};
-  for (const to of rightOrder) rightCursor[to] = rightPos[to].y0;
+  drawRibbons(svg, svgns, leftMatrix, leftOrder, leftPos, midOrder, midPos, xLeft + NODE_W, xMid, scale);
+  drawRibbons(svg, svgns, rightMatrix, midOrder, midPos, rightOrder, rightPos, xMid + NODE_W, xRight, scale);
 
-  for (const frm of leftOrder) {
-    let cursor = leftPos[frm].y0;
-    const outgoing = matrix[frm] || {};
-    for (const to of rightOrder) {
-      const n = outgoing[to] || 0;
-      if (n <= 0) continue;
-      const h = n * scale;
-      const y0a = cursor, y1a = cursor + h;
-      const y0b = rightCursor[to], y1b = rightCursor[to] + h;
-      cursor += h;
-      rightCursor[to] += h;
-      if (h < 0.15) continue;
-
-      const x0 = xLeft + NODE_W, x1 = xRight;
-      const xm = (x0 + x1) / 2;
-      const path = document.createElementNS(svgns, 'path');
-      const d = `M${x0},${y0a} C${xm},${y0a} ${xm},${y0b} ${x1},${y0b} ` +
-                `L${x1},${y1b} C${xm},${y1b} ${xm},${y1a} ${x0},${y1a} Z`;
-      path.setAttribute('d', d);
-      path.setAttribute('fill', bucketColorFor(frm));
-      path.setAttribute('opacity', frm === to ? '0.25' : '0.45');
-      const t = document.createElementNS(svgns, 'title');
-      t.textContent = `${bucketLabelFor(frm)} → ${bucketLabelFor(to)}: ${n}`;
-      path.appendChild(t);
-      svg.appendChild(path);
-    }
+  function labelAt(x, text, anchor) {
+    const t = document.createElementNS(svgns, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', 12);
+    t.setAttribute('font-size', '11'); t.setAttribute('fill', 'var(--text-muted)');
+    if (anchor) t.setAttribute('text-anchor', anchor);
+    t.textContent = text;
+    svg.appendChild(t);
   }
+  labelAt(xLeft, `Prvý (${trends.dates[0]})`);
+  labelAt(xMid + NODE_W / 2, `Zvolený (${trends.dates[migrationMidIndex]})`, 'middle');
+  labelAt(xRight + NODE_W, `Posledný (${trends.dates[n - 1]})`, 'end');
 
-  const colLabelY = 12;
-  const leftColLabel = document.createElementNS(svgns, 'text');
-  leftColLabel.setAttribute('x', xLeft); leftColLabel.setAttribute('y', colLabelY);
-  leftColLabel.setAttribute('font-size', '11'); leftColLabel.setAttribute('fill', 'var(--text-muted)');
-  leftColLabel.textContent = `Predtým (${migration.fromDate || '?'})`;
-  svg.appendChild(leftColLabel);
-  const rightColLabel = document.createElementNS(svgns, 'text');
-  rightColLabel.setAttribute('x', xRight + NODE_W); rightColLabel.setAttribute('y', colLabelY);
-  rightColLabel.setAttribute('font-size', '11'); rightColLabel.setAttribute('fill', 'var(--text-muted)');
-  rightColLabel.setAttribute('text-anchor', 'end');
-  rightColLabel.textContent = `Teraz (${migration.toDate || '?'})`;
-  svg.appendChild(rightColLabel);
+  applyMigrationHighlight();
 }
 
 // ---- Community pages i18n (only this section is localized — rest of the
